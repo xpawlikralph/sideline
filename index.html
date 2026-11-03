@@ -38,34 +38,35 @@ button,input,select{font:inherit;color:inherit}
 
 
 /* ---------- locker-room tunnel ---------- */
-.tunnel{position:fixed;inset:0;perspective:520px;perspective-origin:50% 46%;overflow:hidden;background:#0b0f18;z-index:0}
-.tunnel > div{position:absolute;will-change:background-position}
-.t-wall{top:0;height:100%;width:5200px;
-  background:
-    linear-gradient(180deg,transparent 0 46%,rgba(0,206,184,.85) 46% 49%,transparent 49%),
-    repeating-linear-gradient(180deg,transparent 0 9px,rgba(0,0,0,.35) 9px 12px) 0 14%/100% 13% no-repeat,
-    repeating-linear-gradient(90deg,#11161f 0 6px,#2b3549 6px 10px,#36425b 10px 112px,#273046 112px 116px,#11161f 116px 130px);
-}
-.t-wall::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 92px,#c9d2e3 92px 96px,transparent 96px 130px) 0 56%/100% 7% no-repeat;opacity:.55}
-.t-left{left:0;transform-origin:0 50%;transform:rotateY(90deg)}
-.t-right{right:0;transform-origin:100% 50%;transform:rotateY(-90deg)}
-.t-floor{left:0;bottom:0;width:100%;height:5200px;transform-origin:50% 100%;transform:rotateX(90deg);
-  background:linear-gradient(90deg,transparent 0 41%,rgba(0,206,184,.22) 41% 59%,transparent 59%),
-    repeating-linear-gradient(180deg,#141a26 0 76px,#0f141e 76px 80px)}
-.t-ceil{left:0;top:0;width:100%;height:5200px;transform-origin:50% 0;transform:rotateX(-90deg);
-  background:linear-gradient(90deg,transparent 0 38%,transparent 62%),
-    repeating-linear-gradient(180deg,#0d121b 0 300px,#e9f6ff 300px 330px,#0d121b 330px 360px) 50% 0/26% 100% no-repeat,#0d121b}
-.t-light{left:50%;top:46%;width:240px;height:150px;margin:-75px 0 0 -120px;border-radius:12px;
-  background:radial-gradient(ellipse at center,#fff 0,#dffcf6 35%,rgba(0,206,184,.35) 70%,transparent 75%);opacity:.5;transform:scale(.25)}
-.t-flash{inset:0;background:#e9fffb;opacity:0;pointer-events:none}
+#tunnel{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0;background:#07090d}
 .gate{position:relative;z-index:1}
-.gate-box{background:rgba(21,27,40,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:22px;padding:28px 24px;transition:opacity .2s}
+.gate-box{background:var(--surface);border-radius:20px;padding:28px 24px;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.gate-box.running{background:transparent;box-shadow:none}
+.gate-box .brand,.gate-box h1,.gate-box p,.gate-box .fine,.gate-box .input{transition:opacity .18s}
+.gate-box.running .brand,.gate-box.running h1,.gate-box.running p,.gate-box.running .fine,.gate-box.running .input{opacity:0}
 .gate h1{margin-top:20px}
-.gate-box{background:rgba(21,27,40,calc(.72 - var(--p,0)*.72));backdrop-filter:blur(calc(10px - var(--p,0)*10px));-webkit-backdrop-filter:blur(calc(10px - var(--p,0)*10px))}
-.gate-box .brand,.gate-box h1,.gate-box p,.gate-box .fine,.gate-box .input{opacity:calc(1 - var(--p,0)*1.6)}
 .hold{position:relative;overflow:hidden;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;padding:15px 20px;font-size:15px}
 .hold .fill{position:absolute;inset:0;background:#7ff5e6;transform-origin:0 50%;transform:scaleX(var(--p,0))}
 .hold span{position:relative}
+
+/* player card */
+.sheet-bg{position:fixed;inset:0;background:rgba(5,8,14,.6);z-index:40;display:flex;align-items:center;justify-content:center;padding:20px}
+.sheet{background:var(--surface);border-radius:20px;width:100%;max-width:420px;max-height:88vh;overflow:auto;padding:22px}
+.sheet-top{display:flex;gap:14px;align-items:center}
+.sheet-top .head img,.sheet-top .head .ini{width:72px;height:72px;font-size:20px}
+.sheet h3{margin:0;font-size:20px;font-weight:600;line-height:1.2}
+.sheet .x{margin-left:auto;align-self:flex-start;background:var(--surface-2);border:0;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:18px;line-height:1}
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0}
+.sgrid div{background:var(--bg);border-radius:12px;padding:10px}
+.sgrid b{display:block;font-size:17px;font-weight:600}
+.sgrid span{font-size:11px;color:var(--muted)}
+.inj-box{background:rgba(255,77,109,.1);border-radius:12px;padding:10px 12px;font-size:13px;color:#ffc2cc;margin-top:14px}
+.sheet-actions{display:flex;gap:8px;flex-wrap:wrap}
+.sheet-actions a{flex:1;text-align:center;border-radius:999px;padding:11px 14px;font-weight:600;font-size:13px;background:var(--surface-2)}
+.sheet-actions a.primary{background:var(--teal);color:var(--teal-ink)}
+.pn-btn{background:none;border:0;padding:0;font:inherit;font-weight:600;color:inherit;cursor:pointer;text-align:left;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pn-btn:hover{text-decoration:underline}
+@media (max-width:860px){.sheet-bg{align-items:flex-end;padding:0}.sheet{border-radius:20px 20px 0 0;max-width:none;padding-bottom:calc(22px + env(safe-area-inset-bottom))}}
 /* ---------- app shell ---------- */
 .shell{max-width:1120px;margin:0 auto;padding:20px 20px 100px}
 .topbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
@@ -209,12 +210,12 @@ button,input,select{font:inherit;color:inherit}
 <body>
 
 <!-- connect -->
-<div class="tunnel" id="tunnel" aria-hidden="true"><div class="t-ceil"></div><div class="t-floor"></div><div class="t-wall t-left"></div><div class="t-wall t-right"></div><div class="t-light"></div><div class="t-flash"></div></div>
+<canvas id="tunnel" aria-hidden="true"></canvas>
 <section class="gate" id="gate">
   <div class="gate-box">
     <div class="brand"><svg width="30" height="30" viewBox="0 0 30 30"><rect width="30" height="30" rx="9" fill="#00ceb8"/><path d="M9 19.5c1.4 1.3 3.4 2 5.6 2 3 0 5-1.4 5-3.7 0-4.6-9.6-2.6-9.6-6.4 0-1.2 1.2-2 3-2 1.6 0 3 .5 4 1.4" stroke="#06302b" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>Sideline</div>
     <h1>Trade targets, beat writers and IR stashes for your league</h1>
-    <p>Read-only. Just your Sleeper username, then hold the button.</p>
+    <p>Enter your Sleeper username, then hold the button.</p>
     <form class="field" id="connectForm">
       <input class="input" id="username" placeholder="Sleeper username" autocomplete="off" autocapitalize="off">
       <input class="input" id="season" type="number" min="2018" max="2035" aria-label="Season">
@@ -248,6 +249,7 @@ button,input,select{font:inherit;color:inherit}
   <p class="foot">Player value blends this season's points per game with Sleeper's next-two-week projections in your league's scoring. Writer list is a 2026 starting point; edit any team and it's saved in this browser.</p>
 </div>
 
+<div id="sheet" class="sheet-bg hidden" role="dialog" aria-modal="true"></div>
 <nav class="tabbar hidden" id="tabbar">
   <button data-tab="trade" class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></svg>Trades</button>
   <button data-tab="writers"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h12v14H6a2 2 0 01-2-2V5zM16 9h4v8a2 2 0 01-2 2h-2M8 9h4M8 13h4"/></svg>Writers</button>
@@ -339,37 +341,97 @@ const defSeason=new Date().getMonth()<2?new Date().getFullYear()-1:new Date().ge
 $("#season").value=ls.get("sl_season",defSeason);
 $("#username").value=ls.get("sl_user","RalphieP");
 $("#connectForm").addEventListener("submit",e=>e.preventDefault());
-/* hold-to-enter tunnel */
-const T={off:0,speed:0,p:0,holding:false,done:false,last:0};
-const HOLD_MS=1500, reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
-const tw={l:$(".t-left"),r:$(".t-right"),f:$(".t-floor"),c:$(".t-ceil"),light:$(".t-light"),flash:$(".t-flash"),btn:$("#holdBtn"),box:$(".gate-box")};
-function frame(ts){
-  const raw=Math.min(400,ts-(T.last||ts)),dt=Math.min(50,raw);T.last=ts;
-  if(!T.done){T.p=T.holding?Math.min(1,T.p+raw/HOLD_MS):Math.max(0,T.p-raw/500)}
-  const target=reduce?0:(T.done?3600:20+T.p*T.p*3200);T.speed+=(target-T.speed)*Math.min(1,dt/120);
-  T.off+=T.speed*dt/1000;
-  const o=T.off;
-  tw.l.style.backgroundPosition=`0 0,${-o}px 14%,${-o}px 0`;tw.r.style.backgroundPosition=`0 0,${o}px 14%,${o}px 0`;
-  tw.l.style.setProperty("--o",o);tw.f.style.backgroundPosition=`0 0,0 ${o}px`;tw.c.style.backgroundPosition=`0 0,50% ${-o}px`;
-  const lp=T.done?1:T.p;tw.light.style.transform=`scale(${.25+lp*lp*2.2})`;tw.light.style.opacity=.5+lp*.5;
-  tw.btn.style.setProperty("--p",T.p);tw.box.style.setProperty("--p",T.done?1:T.p);tw.box.style.opacity=T.done?0:1;
-  if(T.p>=1&&!T.done){T.done=true;if(navigator.vibrate)try{navigator.vibrate(30)}catch(e){};burst()}
-  if(!$("#gate").classList.contains("hidden")||T.done)requestAnimationFrame(frame);
+/* hold-to-enter: canvas locker-room run */
+const cv=$("#tunnel"),g=cv.getContext("2d"),reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const T={p:0,holding:false,done:false,doneT:0,camZ:0,t:0,last:0,v:0};
+const HOLD_MS=1500,HW=1.9,CEIL=3.0,LZ=0.62;
+let VW=0,VH=0;
+function resize(){const d=Math.min(2,devicePixelRatio||1);VW=innerWidth;VH=innerHeight;cv.width=VW*d;cv.height=VH*d;g.setTransform(d,0,0,d,0,0)}
+addEventListener("resize",resize);resize();
+let C={};
+function P(x,y,z){const f=C.f/(z-C.z);return [C.cx+(x-C.x)*f,C.cy-(y-C.y)*f]}
+function poly(pts,fill){g.beginPath();pts.forEach((q,i)=>{const s=P(q[0],q[1],q[2]);i?g.lineTo(s[0],s[1]):g.moveTo(s[0],s[1])});g.closePath();g.fillStyle=fill;g.fill()}
+function col(rgb,k){return `rgb(${rgb[0]*k|0},${rgb[1]*k|0},${rgb[2]*k|0})`}
+function wallQ(x,y0,y1,z0,z1,fill){poly([[x,y0,z0],[x,y1,z0],[x,y1,z1],[x,y0,z1]],fill)}
+function draw(openD){
+  const zN=C.z+0.12, zO=C.z+openD;
+  const light=z=>{const d=z-C.z;return Math.min(1.25,0.18+0.82*Math.exp(-d/7)+0.9*Math.exp(-Math.max(0,zO-z)/2.2))};
+  g.fillStyle="#07090d";g.fillRect(0,0,VW,VH);
+  // field through the opening
+  const tl=P(-HW,CEIL,zO),br=P(HW,0,zO),hz=P(0,1.15,zO)[1];
+  const sky=g.createLinearGradient(0,tl[1],0,hz);sky.addColorStop(0,"#cfe0f2");sky.addColorStop(1,"#f6fbff");
+  g.fillStyle=sky;g.fillRect(tl[0],tl[1],br[0]-tl[0],hz-tl[1]);
+  // stands: tiers of seats with crowd specks, lit from the rim
+  const st0=tl[1]+(hz-tl[1])*0.28,sw=br[0]-tl[0];
+  g.fillStyle="#2b3240";g.fillRect(tl[0],st0,sw,hz-st0);
+  for(let r=0;r<14;r++){const y=st0+(hz-st0)*r/14,hh=(hz-st0)/14;g.fillStyle=r%2?"#323a4a":"#283040";g.fillRect(tl[0],y,sw,hh*0.82);
+    const n=Math.max(8,Math.min(400,sw/(hh*0.75))|0);for(let c=0;c<n;c++){const hsh=Math.sin((c+1)*12.9898+(r+1)*78.233)*43758.5453;const fr=hsh-Math.floor(hsh);
+      g.fillStyle=fr<.25?"#00ceb8":fr<.5?"#c9d2e3":fr<.62?"#fc2b6d":"#4a5468";{const d=Math.max(1,hh*0.26);g.fillRect(tl[0]+(c+fr*.5)*sw/n,y+hh*(0.18+fr*0.12),d,d)}}}
+  g.fillStyle="#1b2029";g.fillRect(tl[0],hz-(hz-st0)*0.05,sw,(hz-st0)*0.05);
+  g.fillStyle="#2f7d3a";g.fillRect(tl[0],hz,br[0]-tl[0],br[1]-hz);
+  g.fillStyle="#3b8f46";for(let i=0;i<6;i++){const y0=hz+(br[1]-hz)*Math.pow(i/6,1.8),y1=hz+(br[1]-hz)*Math.pow((i+.5)/6,1.8);g.fillRect(tl[0],y0,br[0]-tl[0],y1-y0)}
+  g.fillStyle="rgba(255,255,255,.85)";[.18,.45,.8].forEach(t=>{const y=hz+(br[1]-hz)*t;g.fillRect(tl[0],y,br[0]-tl[0],Math.max(1,(br[1]-hz)*.012))});
+  // floor + runner + seams
+  poly([[-HW,0,zN],[HW,0,zN],[HW,0,zO],[-HW,0,zO]],"#15191f");
+  for(let z=Math.floor(zN/1.2)*1.2;z<zO;z+=1.2){const z0=Math.max(z,zN),z1=Math.min(z+1.2,zO);if(z1<=z0)continue;const k=light((z0+z1)/2);
+    poly([[-0.55,0,z0],[0.55,0,z0],[0.55,0,z1],[-0.55,0,z1]],col([22,62,60],k));
+    poly([[-HW,0,z0],[HW,0,z0],[HW,0,Math.min(z0+.03,z1)],[-HW,0,Math.min(z0+.03,z1)]],col([8,10,13],1))}
+  // ceiling + light panels
+  poly([[-HW,CEIL,zN],[HW,CEIL,zN],[HW,CEIL,zO],[-HW,CEIL,zO]],"#0c0f14");
+  for(let z=Math.floor(zN/2.4)*2.4+0.7;z<zO;z+=2.4){if(z+0.9<=zN)continue;const k=Math.min(1,light(z)+.25);poly([[-0.32,CEIL,Math.max(z,zN)],[0.32,CEIL,Math.max(z,zN)],[0.32,CEIL,Math.min(z+0.9,zO)],[-0.32,CEIL,Math.min(z+0.9,zO)]],col([236,244,255],k))}
+  // walls: far to near
+  for(const side of [-1,1]){const x=side*HW;
+    wallQ(x,0,CEIL,zN,zO,"#0e1117");
+    const i0=Math.floor(zN/LZ),i1=Math.ceil(zO/LZ);
+    for(let i=i1;i>=i0;i--){const z0=Math.max(i*LZ,zN),z1=Math.min((i+1)*LZ,zO);if(z1-z0<0.05)continue;const k=light((z0+z1)/2);
+      wallQ(x,0,0.18,z0,z1,col([10,12,16],1));
+      wallQ(x,2.16,2.26,z0,z1,col([40,47,60],k));
+      wallQ(x,2.26,CEIL,z0,z1,col([26,31,40],k));
+      const a=Math.max(i*LZ+0.025,zN),b=Math.min((i+1)*LZ-0.025,zO);if(b<=a)continue;
+      wallQ(x,0.2,2.14,a,b,col([84,98,122],k));
+      const va=Math.max(i*LZ+0.12,zN),vb=Math.min((i+1)*LZ-0.12,zO);
+      if(vb>va)for(let s=0;s<4;s++){const y=1.88+s*0.055;wallQ(x,y,y+0.022,va,vb,col([38,45,58],k))}
+      const hz0=side<0?(i+1)*LZ-0.13:i*LZ+0.1,hz1=hz0+0.03;
+      if(hz0>zN&&hz1<zO)wallQ(x,1.02,1.26,hz0,hz1,col([190,198,212],k));
+    }
+    // bench
+    const bx=x-side*0.4;
+    for(let z=Math.floor(zN/1.2)*1.2;z<zO;z+=1.2){const z0=Math.max(z,zN),z1=Math.min(z+1.2,zO);if(z1<=z0)continue;const k=light((z0+z1)/2);
+      poly([[x,0.47,z0],[bx,0.47,z0],[bx,0.47,z1],[x,0.47,z1]],col([128,90,56],k));
+      wallQ(bx,0.39,0.47,z0,z1,col([86,60,38],k))}
+  }
+  // vignette
+  const vg=g.createRadialGradient(VW/2,VH*.47,Math.min(VW,VH)*.25,VW/2,VH*.5,Math.max(VW,VH)*.75);vg.addColorStop(0,"rgba(0,0,0,0)");vg.addColorStop(1,"rgba(0,0,0,.55)");g.fillStyle=vg;g.fillRect(0,0,VW,VH);
 }
-function burst(){tw.flash.style.transition="opacity .35s";tw.flash.style.opacity=1;setTimeout(()=>connect().then(ok=>{if(!ok)resetTunnel()}),350)}
-function resetTunnel(){T.done=false;T.p=0;T.holding=false;tw.flash.style.opacity=0;tw.box.style.opacity=1;T.last=0;requestAnimationFrame(frame)}
+const box=$(".gate-box"),hb=$("#holdBtn");
+function frame(ts){
+  const raw=Math.min(400,ts-(T.last||ts)),dt=Math.min(50,raw)/1000;T.last=ts;
+  if(!T.done){T.p=T.holding?Math.min(1,T.p+raw/HOLD_MS):Math.max(0,T.p-raw/450)}
+  const target=reduce?0:T.done?18:0.5+Math.pow(T.p,1.6)*15;T.v+=(target-T.v)*Math.min(1,dt*6);
+  T.camZ+=T.v*dt;T.t+=dt;
+  let openD=reduce?30:30*Math.pow(1-T.p,2)+4.2;
+  if(T.done){const e=Math.min(1,(ts-T.doneT)/520);openD=4.2-2.0*e*(2-e);cv.style.opacity=e>0.55?String(Math.max(0,1-(e-0.55)/0.45)):"1"}
+  const run=reduce?0:Math.min(1,T.v/15),step=T.t*(2.2+run*5)*Math.PI*2;
+  C={x:Math.sin(step/2)*0.025*run,y:1.55+Math.abs(Math.sin(step))*0.06*run,z:T.camZ,f:Math.max(VW,VH*0.9)*0.62,cx:VW/2,cy:VH*0.47};
+  draw(openD);
+  hb.style.setProperty("--p",T.p);box.classList.toggle("running",T.p>0.04||T.done);
+  if(T.p>=1&&!T.done){T.done=true;T.doneT=ts;if(navigator.vibrate)try{navigator.vibrate(25)}catch(e){};setTimeout(()=>connect().then(ok=>{if(!ok)resetTunnel()}),540)}
+  if(!cv.classList.contains("hidden"))requestAnimationFrame(frame);
+}
+function resetTunnel(){T.done=false;T.p=0;T.holding=false;T.last=0;cv.style.opacity="1";cv.classList.remove("hidden");box.classList.remove("running");requestAnimationFrame(frame)}
 function startHold(e){if(e)e.preventDefault();if(T.done)return;if(!$("#username").value.trim()){$("#gateErr").textContent="Enter your Sleeper username.";return}$("#gateErr").textContent="";T.holding=true}
 function endHold(){T.holding=false}
-tw.btn.addEventListener("pointerdown",startHold);
-["pointerup","pointercancel","pointerleave"].forEach(ev=>tw.btn.addEventListener(ev,endHold));
-window.addEventListener("blur",endHold);
-tw.btn.addEventListener("contextmenu",e=>e.preventDefault());
-document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&!$("#gate").classList.contains("hidden")&&!e.repeat&&(document.activeElement===tw.btn||e.key==="Enter")){startHold(e)}});
+hb.addEventListener("pointerdown",startHold);
+["pointerup","pointercancel","pointerleave"].forEach(ev=>hb.addEventListener(ev,endHold));
+hb.addEventListener("contextmenu",e=>e.preventDefault());
+addEventListener("blur",endHold);
+document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&!e.repeat&&!$("#gate").classList.contains("hidden"))startHold(e)});
 document.addEventListener("keyup",e=>{if(e.key==="Enter"||e.key===" ")endHold()});
 requestAnimationFrame(frame);
+
 $("#leagueSel").addEventListener("change",e=>loadLeague(e.target.value));
 $("#teamSel").addEventListener("change",e=>{S.teamRosterId=+e.target.value;ls.set("sl_team_"+S.league.league_id,S.teamRosterId);renderAll()});
-$("#switchUser").addEventListener("click",()=>{$("#tunnel").classList.remove("hidden");$("#tunnel").style.opacity=1;resetTunnel();$("#app").classList.add("hidden");$("#tabbar").classList.add("hidden");$("#gate").classList.remove("hidden");$("#username").focus()});
+$("#switchUser").addEventListener("click",()=>{resetTunnel();$("#app").classList.add("hidden");$("#tabbar").classList.add("hidden");$("#gate").classList.remove("hidden");$("#username").focus()});
 function showTab(t){document.querySelectorAll("[data-tab]").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));["trade","writers","tent"].forEach(x=>$("#tab-"+x).classList.toggle("hidden",x!==t));ls.set("sl_tab",t);window.scrollTo({top:0})}
 document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
 
@@ -378,7 +440,7 @@ async function connect(){
   if(!name){err.textContent="Enter your Sleeper username.";return}
   err.textContent="";
   try{
-    const user=await j("/user/"+encodeURIComponent(name));
+    const user=await j("/user/"+encodeURIComponent(name)).catch(e=>{if(/404/.test(e.message))return null;throw e});
     if(!user||!user.user_id)throw new Error(`No Sleeper account named ${name}. Check the spelling in your Sleeper profile.`);
     const leagues=await j(`/user/${user.user_id}/leagues/nfl/${season}`);
     if(!leagues.length)throw new Error(`${user.display_name} has no ${season} leagues. Try another season.`);
@@ -386,7 +448,7 @@ async function connect(){
     $("#leagueSel").innerHTML=leagues.map(l=>`<option value="${l.league_id}">${esc(l.name)}</option>`).join("");
     const saved=ls.get("sl_league",null);const pick=leagues.find(l=>l.league_id===saved)?saved:leagues[0].league_id;
     $("#leagueSel").value=pick;$("#leagueSel").classList.toggle("hidden",leagues.length<2);
-    $("#gate").classList.add("hidden");$("#tunnel").style.transition="opacity .5s";$("#tunnel").style.opacity=0;setTimeout(()=>{$("#tunnel").classList.add("hidden");T.done=false},520);$("#app").classList.remove("hidden");$("#tabbar").classList.remove("hidden");
+    $("#gate").classList.add("hidden");$("#tunnel").classList.add("hidden");T.done=false;$("#app").classList.remove("hidden");$("#tabbar").classList.remove("hidden");
     await loadLeague(pick);return true;
   }catch(e){$("#gate").classList.remove("hidden");err.textContent=(e instanceof TypeError)?"Couldn't reach Sleeper. This page has to be opened in a regular browser tab (Safari or Chrome), not an in-app file preview.":(e.message||String(e));return false}
 }
@@ -454,9 +516,23 @@ const ord=n=>n+(["th","st","nd","rd"][(n%100-20)%10]||["th","st","nd","rd"][n%10
 function xSearch(p){return "https://x.com/search?f=live&q="+encodeURIComponent(`"${pname(p)}"`)}
 function injText(p){const st=p.injury_status;if(!st)return "";return ` <span class="inj${st==="Questionable"?" q":""}">${esc(st)}${p.injury_body_part?" ("+esc(p.injury_body_part)+")":""}</span>`}
 function sub(p,extra=""){return `<span class="pos ${esc(p.position)}">${esc(p.position)}</span> - ${esc(p.team||"FA")}${extra}${injText(p)}`}
-function playerRow(p,right,badges="",extra=""){return `<div class="row">${headshot(p)}<div class="pinfo"><div class="pn"><a href="${xSearch(p)}" target="_blank" rel="noopener">${esc(pname(p))}</a>${badges}</div><div class="ps">${sub(p,extra)}</div></div>${right}</div>`}
+function playerRow(p,right,badges="",extra=""){return `<div class="row">${headshot(p)}<div class="pinfo"><div class="pn"><button class="pn-btn" data-pid="${esc(p.player_id)}">${esc(pname(p))}</button>${badges}</div><div class="ps">${sub(p,extra)}</div></div>${right}</div>`}
 function statR(v,l,big){return `<div class="stat-r${big?" big":""}"><b>${v}</b><span>${l}</span></div>`}
 
+function ownerOf(pid){const r=S.rosters.find(x=>rosterPids(x).includes(pid));return r?teamName(r):"Free agent"}
+function openPlayer(pid){
+  const p=pl(pid),m=metric(pid),yr=+S.league.season,doc=docSearch([p]);
+  $("#sheet").innerHTML=`<div class="sheet"><div class="sheet-top">${headshot(p)}<div style="min-width:0"><h3>${esc(pname(p))}</h3><div class="ps">${sub(p)}</div><div class="ps">${p.age?`Age ${p.age}`:""}${p.years_exp!=null?`${p.age?", ":""}${p.years_exp===0?"rookie":"year "+(p.years_exp+1)}`:""}</div></div><button class="x" aria-label="Close">×</button></div>
+    ${p.injury_status?`<div class="inj-box"><b>${esc(p.injury_status)}</b>${p.injury_body_part?" ("+esc(p.injury_body_part)+")":""}${p.injury_notes?`. ${esc(p.injury_notes)}`:""}</div>`:""}
+    <div class="sgrid"><div><b>${f1(m.ppg)}</b><span>${yr} ppg</span></div><div><b>${m.gp||0}</b><span>Games</span></div><div><b>${f1(m.prev)}</b><span>${yr-1} ppg</span></div>
+      <div><b>${f1(m.proj)}</b><span>Projected</span></div><div><b>${f1(m.value)}</b><span>Value</span></div><div><b>×${m.kf.toFixed(2)}</b><span>Keeper age</span></div></div>
+    <div class="ps" style="margin-bottom:14px">Rostered by <b style="color:var(--text)">${esc(ownerOf(pid))}</b></div>
+    <div class="sheet-actions"><a class="primary" href="${xSearch(p)}" target="_blank" rel="noopener">Latest news on X</a>${doc?`<a href="${doc}" target="_blank" rel="noopener">Doctor read</a>`:""}</div></div>`;
+  $("#sheet").classList.remove("hidden");$("#sheet .x").focus();
+}
+function closeSheet(){$("#sheet").classList.add("hidden")}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-pid]");if(b){openPlayer(b.dataset.pid);return}if(e.target.id==="sheet"||e.target.closest("#sheet .x"))closeSheet()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeSheet()});
 function renderAll(){for(const k in MET)delete MET[k];const prof=teamProfiles();renderHeader(prof);renderTrade(prof);renderWriters();renderTent()}
 
 function renderHeader(prof){
