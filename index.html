@@ -1099,7 +1099,7 @@ const glowTex=tex(128,128,(g,w,h)=>{const gr=g.createRadialGradient(64,64,0,64,6
 const poleMat=basic({color:0x2a3140}),lampMat=basic({color:0xffffff});lampMat.color.setScalar(6);
 for(const [x,z] of [[-FW/2-52,Z0-14],[FW/2+52,Z0-14],[-FW/2-52,fz],[FW/2+52,fz],[-FW/2-52,fz-FL/2+4],[FW/2+52,fz-FL/2+4]]){const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.7,1,58,10),poleMat);pole.position.set(x,29,z);scene.add(pole);
   const bank=new THREE.Mesh(new THREE.BoxGeometry(12,6,0.5),lampMat);bank.position.set(x*0.98,60,z);bank.lookAt(0,0,fz);scene.add(bank);
-  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0xdfe9ff,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,fog:false}));sp.scale.set(70,70,1);sp.position.copy(bank.position);scene.add(sp)}
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0xdfe9ff,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,fog:false}));sp.scale.set(26,26,1);sp.material.opacity=0.7;sp.position.copy(bank.position);scene.add(sp)}
 // night sky
 const skyTex=tex(64,512,(g,w,h)=>{const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,"#050a16");gr.addColorStop(.42,"#0c1a36");gr.addColorStop(.5,"#1d3358");gr.addColorStop(.56,"#4a6a96");gr.addColorStop(.62,"#22385c");gr.addColorStop(1,"#0a1222");g.fillStyle=gr;g.fillRect(0,0,w,h)});
 const sky=new THREE.Mesh(new THREE.SphereGeometry(260,32,16),basic({map:skyTex,side:THREE.BackSide}));sky.position.set(0,0,fz);scene.add(sky);
