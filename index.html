@@ -21,30 +21,30 @@ button,input,select{font:inherit;color:inherit}
 .hidden{display:none!important}
 
 /* ---------- connect screen ---------- */
-.gate{min-height:100vh;display:grid;place-items:center;padding:24px}
-.gate-box{width:100%;max-width:380px;text-align:center}
+.gate{min-height:100vh;display:flex;align-items:flex-end;justify-content:center;padding:24px 20px calc(5vh + env(safe-area-inset-bottom))}
+.gate-box{width:100%;max-width:360px;text-align:center}
 .brand{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:22px;letter-spacing:-.01em}
 .brand svg{display:block}
-.gate h1{font-size:26px;font-weight:600;line-height:1.25;margin:28px 0 8px;letter-spacing:-.01em}
-.gate p{color:var(--muted);margin:0 0 24px}
-.field{display:flex;flex-direction:column;gap:10px}
+.gate h1{font-size:20px;font-weight:700;line-height:1.25;margin:12px 0 4px;letter-spacing:-.01em}
+.gate p{color:var(--muted);margin:0 0 14px;font-size:13px}
+.gate-form{display:flex;flex-direction:column;gap:10px}
 .input{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:13px 14px;font-size:15px;width:100%}
 .input::placeholder{color:var(--faint)}
 .btn{border:0;border-radius:999px;padding:12px 20px;font-weight:600;cursor:pointer;background:var(--surface-2)}
 .btn.primary{background:var(--teal);color:var(--teal-ink)}
 .btn.primary:hover{filter:brightness(1.08)}
 .gate .err{color:var(--red);font-size:13px;min-height:20px;margin-top:12px}
-.gate .fine{color:var(--faint);font-size:12px;margin-top:28px}
+.gate .fine{color:var(--faint);font-size:11px;margin-top:8px}
 
 
 /* ---------- locker-room tunnel ---------- */
 #tunnel{position:fixed;inset:0;width:100%!important;height:100%!important;display:block;z-index:0;background:#05070a;transition:opacity .45s}
 .gate{position:relative;z-index:1}
-.gate-box{background:var(--surface);border-radius:20px;padding:28px 24px;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.gate-box{background:rgba(21,27,40,.92);border:1px solid rgba(255,255,255,.06);border-radius:22px;padding:20px 20px 16px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
 .gate-box.running{background:transparent;box-shadow:none}
 .gate-box .brand,.gate-box h1,.gate-box p,.gate-box .fine,.gate-box .input{transition:opacity .18s}
 .gate-box.running .brand,.gate-box.running h1,.gate-box.running p,.gate-box.running .fine,.gate-box.running .input{opacity:0}
-.gate h1{margin-top:20px}
+
 .hold{position:relative;overflow:hidden;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;padding:15px 20px;font-size:15px}
 .hold .fill{position:absolute;inset:0;background:#7ff5e6;transform-origin:0 50%;transform:scaleX(var(--p,0))}
 .hold span{position:relative}
@@ -428,14 +428,14 @@ button,input,select{font:inherit;color:inherit}
   <div class="gate-box">
     <div class="brand"><svg width="30" height="30" viewBox="0 0 30 30"><rect width="30" height="30" rx="9" fill="#00ceb8"/><path d="M9 19.5c1.4 1.3 3.4 2 5.6 2 3 0 5-1.4 5-3.7 0-4.6-9.6-2.6-9.6-6.4 0-1.2 1.2-2 3-2 1.6 0 3 .5 4 1.4" stroke="#06302b" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>Sideline</div>
     <h1>Your league's front office</h1>
-    <p>Enter your Sleeper username, then hold the button.</p>
-    <form class="field" id="connectForm">
+    <p>Enter your Sleeper username and hold to run out.</p>
+    <form class="gate-form" id="connectForm">
       <input class="input" id="username" placeholder="Your Sleeper username" autocomplete="off" autocapitalize="off">
-      <input class="input" id="season" type="number" min="2018" max="2035" aria-label="Season">
+      <input class="input" id="season" type="number" min="2018" max="2035" aria-label="Season" style="display:none">
       <button class="btn primary hold" type="button" id="holdBtn"><i class="fill"></i><span>Hold to run out</span></button>
     </form>
     <div class="err" id="gateErr"></div>
-    <div class="fine">Your username is on your Sleeper profile. Read-only: Sleeper doesn't let outside apps use its password login, and nothing is ever posted to your league.</div>
+    <div class="fine">Read-only. Nothing is ever posted to your league.</div>
   </div>
 </section>
 
@@ -868,8 +868,8 @@ const RUN=window.RUN, cv=document.getElementById("tunnel"), hb=document.getEleme
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:"high-performance"});
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
-renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;renderer.outputColorSpace=THREE.SRGBColorSpace;
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x040508);scene.fog=new THREE.FogExp2(0x05070b,0.038);
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=0.9;renderer.outputColorSpace=THREE.SRGBColorSpace;
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x040508);scene.fog=new THREE.FogExp2(0x05070b,0.026);
 const camera=new THREE.PerspectiveCamera(62,1,0.05,140);
 const pm=new THREE.PMREMGenerator(renderer);const env=pm.fromScene(new RoomEnvironment(),0.04).texture;scene.environment=env;
 
@@ -886,6 +886,7 @@ const carpet=tex(512,512,(g,w,h)=>{g.fillStyle="#121a2b";g.fillRect(0,0,w,h);spe
 const rubber=tex(256,256,(g,w,h)=>{g.fillStyle="#1a1c20";g.fillRect(0,0,w,h);speckle(g,w,h,9000,["#2a2d33","#101114","#3a3e45"],1.5,1)},[4,30]);
 const tiles=tex(512,512,(g,w,h)=>{g.fillStyle="#5d6168";g.fillRect(0,0,w,h);speckle(g,w,h,14000,["#4a4e55","#6c7179","#3d4046"],1.2,1);g.fillStyle="#5c6168";for(let i=0;i<=2;i++){g.fillRect(i*w/2-2,0,4,h);g.fillRect(0,i*h/2-2,w,4)}},[3.5,30]);
 const paint=tex(256,256,(g,w,h)=>{g.fillStyle="#161e2d";g.fillRect(0,0,w,h);speckle(g,w,h,6000,["#1b2436","#121926"],2,.8)},[30,2]);
+const aoBack=tex(256,512,(g,w,h)=>{woodDraw("#3a2414","#170b04","#5a3a22")(g,w,h);const v=g.createLinearGradient(0,0,0,h);v.addColorStop(0,"rgba(0,0,0,.55)");v.addColorStop(.18,"rgba(0,0,0,.05)");v.addColorStop(.7,"rgba(0,0,0,.15)");v.addColorStop(1,"rgba(0,0,0,.7)");g.fillStyle=v;g.fillRect(0,0,w,h);const hz=g.createLinearGradient(0,0,w,0);hz.addColorStop(0,"rgba(0,0,0,.5)");hz.addColorStop(.2,"rgba(0,0,0,0)");hz.addColorStop(.8,"rgba(0,0,0,0)");hz.addColorStop(1,"rgba(0,0,0,.5)");g.fillStyle=hz;g.fillRect(0,0,w,h)});
 const NAMES=["CARTER","MORGAN","REYES","COLLINS","BROOKS","HAYES","PRICE","WARD"];
 function jerseyTex(i){const navy=i%2===0;return tex(256,320,(g,w,h)=>{
   g.clearRect(0,0,w,h);g.fillStyle=navy?"#1c2944":"#e9edf3";
@@ -894,6 +895,7 @@ function jerseyTex(i){const navy=i%2===0;return tex(256,320,(g,w,h)=>{
   g.fillStyle="rgba(0,0,0,.18)";for(let k=0;k<6;k++)g.fillRect(60+rnd()*130,110,2+rnd()*3,200);
   g.fillStyle=navy?"#ffffff":"#1c2944";g.font="bold 26px Arial";g.textAlign="center";g.fillText(NAMES[i%NAMES.length],128,100);
   g.font="bold 120px Arial";g.lineWidth=6;g.strokeStyle=navy?"#00ceb8":"#00a896";const num=String([12,7,88,24,3,51,19,33][i%8]);g.strokeText(num,128,232);g.fillText(num,128,232)})}
+function plateTex(i){return tex(256,48,(g,w,h)=>{g.fillStyle="#d9dee6";g.fillRect(0,0,w,h);const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,"rgba(255,255,255,.6)");gr.addColorStop(1,"rgba(0,0,0,.15)");g.fillStyle=gr;g.fillRect(0,0,w,h);g.fillStyle="#1c2944";g.font="bold 24px Arial";g.textAlign="center";g.textBaseline="middle";g.fillText(`${NAMES[i%NAMES.length]}  ${[12,7,88,24,3,51,19,33][i%8]}`,w/2,h/2+1)})}
 function stadiumTex(){return tex(1024,768,(g,w,h)=>{
   const sky=g.createLinearGradient(0,0,0,h*.45);sky.addColorStop(0,"#0a1222");sky.addColorStop(1,"#2a3a58");g.fillStyle=sky;g.fillRect(0,0,w,h*.45);
   for(const x of [140,420,640,900]){g.fillStyle="#fffbe8";g.fillRect(x-60,40,120,26);const gl=g.createRadialGradient(x,53,4,x,53,170);gl.addColorStop(0,"rgba(255,250,230,.55)");gl.addColorStop(1,"rgba(255,250,230,0)");g.fillStyle=gl;g.fillRect(x-170,0,340,230)}
@@ -917,8 +919,13 @@ const M={
   mask:new THREE.MeshStandardMaterial({color:0xd9dee6,metalness:.8,roughness:.3}),
   strip:new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xfff1dc,emissiveIntensity:4}),
   plate:new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xe8f1ff,emissiveIntensity:0.9}),
-  led:new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xf4f8ff,emissiveIntensity:1.6}),
-  trim:new THREE.MeshStandardMaterial({color:0x2a2f38,metalness:.7,roughness:.35})
+  led:new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xf4f8ff,emissiveIntensity:1.1}),
+  trim:new THREE.MeshStandardMaterial({color:0x2a2f38,metalness:.7,roughness:.35}),
+  pads:new THREE.MeshStandardMaterial({color:0x2b2f36,roughness:.55,envMapIntensity:.4}),
+  padTrim:new THREE.MeshStandardMaterial({color:0xe9edf3,roughness:.6}),
+  cleat:new THREE.MeshPhysicalMaterial({color:0x0d0f13,roughness:.35,clearcoat:.6}),
+  rod:new THREE.MeshStandardMaterial({color:0xb8c0cc,metalness:.9,roughness:.25}),
+  back:new THREE.MeshStandardMaterial({map:aoBack,roughness:.6,envMapIntensity:.2})
 };
 function plane(w,h,mat,pos,rot){const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),mat);m.position.set(...pos);if(rot)m.rotation.set(...rot);scene.add(m);return m}
 function boxM(w,h,d,mat,pos){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(...pos);scene.add(m);return m}
@@ -946,15 +953,32 @@ inst(new THREE.BoxGeometry(DEP-0.02,0.26,SW-0.05),M.woodDark,N*2,(d,i,s)=>{d.pos
 inst(new THREE.BoxGeometry(0.02,0.02,SW-0.14),M.strip,N*2,(d,i,s)=>{d.position.set(s*(HW-DEP+0.06),2.0,zOf(i))});
 inst(new THREE.BoxGeometry(DEP,0.44,SW-0.05),M.woodDark,N*2,(d,i,s)=>{d.position.set(xIn(s),0.22,zOf(i))});
 inst(new THREE.BoxGeometry(DEP-0.06,0.08,SW-0.12),M.leather,N*2,(d,i,s)=>{d.position.set(xIn(s)+s*0.02,0.48,zOf(i))});
-inst(new THREE.BoxGeometry(0.01,0.055,0.32),M.plate,N*2,(d,i,s)=>{d.position.set(s*(HW-DEP-0.035),2.5,zOf(i))});
+
 const hg=new THREE.SphereGeometry(0.15,32,24);hg.scale(1.18,0.92,1);
-inst(hg,M.helmet,N*2,(d,i,s)=>{if((i*7+(s>0?3:0))%5===4)return false;d.position.set(xIn(s)+s*0.05,2.18,zOf(i));d.rotation.set(0,s>0?Math.PI:0,0)});
+inst(hg,M.helmet,N*2,(d,i,s)=>{if((i*7+(s>0?3:0))%5===4)return false;d.position.set(xIn(s)+s*0.03,2.17,zOf(i)+0.12);d.rotation.set(0,s>0?Math.PI*0.75:Math.PI*0.25,0)});
 const mg=new THREE.TorusGeometry(0.1,0.009,8,24,Math.PI);
-inst(mg,M.mask,N*2,(d,i,s)=>{if((i*7+(s>0?3:0))%5===4)return false;d.position.set(xIn(s)-s*0.12,2.13,zOf(i));d.rotation.set(Math.PI,s>0?Math.PI/2:-Math.PI/2,0)});
-// jerseys: 4 materials
-const jg=new THREE.PlaneGeometry(0.62,0.78);
-for(let v=0;v<4;v++){const mat=new THREE.MeshStandardMaterial({map:jerseyTex(v),transparent:true,alphaTest:.4,side:THREE.DoubleSide,roughness:.85});
-  inst(jg,mat,N*2,(d,i,s,k)=>{if(((i*3+(s>0?1:0))%4)!==v)return false;d.position.set(s*(HW-0.16),1.45,zOf(i));d.rotation.set(0,s>0?-Math.PI/2:Math.PI/2,(rnd()-.5)*0.04)})}
+inst(mg,M.mask,N*2,(d,i,s)=>{if((i*7+(s>0?3:0))%5===4)return false;d.position.set(xIn(s)-s*0.09,2.12,zOf(i)+0.2);d.rotation.set(Math.PI,s>0?Math.PI*0.75-Math.PI/2:-(Math.PI*0.25)-Math.PI/2+Math.PI,0)});
+// stall interiors (shadowed back panels)
+inst(new THREE.PlaneGeometry(SW-0.06,2.0),M.back,N*2,(d,i,s)=>{d.position.set(s*(HW-0.05),1.0+0.02,zOf(i));d.rotation.set(0,s<0?Math.PI/2:-Math.PI/2,0);d.scale.set(1,1,1)});
+// hanger rods
+const rg=new THREE.CylinderGeometry(0.008,0.008,SW-0.1,8);rg.rotateX(Math.PI/2);
+inst(rg,M.rod,N*2,(d,i,s)=>{d.position.set(s*(HW-0.32),1.88,zOf(i));d.rotation.set(0,0,0)});
+// jerseys on hangers, angled toward the hallway so they read as you run
+const jg=new THREE.PlaneGeometry(0.6,0.76);
+for(let v=0;v<8;v++){const mat=new THREE.MeshStandardMaterial({map:jerseyTex(v),transparent:true,alphaTest:.4,side:THREE.DoubleSide,roughness:.85,envMapIntensity:.15});
+  inst(jg,mat,N*2,(d,i,s)=>{if(((i*3+(s>0?5:0))%8)!==v)return false;d.position.set(s*(HW-0.32),1.47,zOf(i)+0.05);d.rotation.set(0,s<0?0.95:-0.95,(rnd()-.5)*0.05)})}
+// shoulder pads beside the helmet
+const pg2=new THREE.SphereGeometry(0.17,24,12,0,Math.PI*2,0,Math.PI/2);pg2.scale(1.35,0.75,0.9);
+inst(pg2,M.pads,N*2,(d,i,s)=>{d.position.set(xIn(s)+s*0.02,2.04,zOf(i)-0.2);d.rotation.set(0,s<0?Math.PI/2:-Math.PI/2,0)});
+const pt=new THREE.TorusGeometry(0.17,0.012,6,24,Math.PI);pt.scale(1.35,1,0.9);
+inst(pt,M.padTrim,N*2,(d,i,s)=>{d.position.set(xIn(s)+s*0.02,2.045,zOf(i)-0.2);d.rotation.set(-Math.PI/2,0,s<0?Math.PI/2:-Math.PI/2)});
+// cleats on the seat
+const cg=new THREE.BoxGeometry(0.1,0.09,0.27);
+for(const off of [-0.07,0.07])inst(cg,M.cleat,N*2,(d,i,s)=>{if((i+(s>0?1:0))%3===0)return false;d.position.set(s*(HW-DEP/2-0.05),0.565,zOf(i)+0.22+off);d.rotation.set(0,s*0.5+off,0)});
+// nameplates with names
+const plg=new THREE.PlaneGeometry(0.34,0.064);
+for(let v=0;v<8;v++){const mat=new THREE.MeshStandardMaterial({map:plateTex(v),emissive:0xffffff,emissiveMap:plateTex(v),emissiveIntensity:.35,roughness:.4});
+  inst(plg,mat,N*2,(d,i,s)=>{if(((i*3+(s>0?5:0))%8)!==v)return false;d.position.set(s*(HW-DEP-0.05),2.5,zOf(i));d.rotation.set(0,s<0?Math.PI/2:-Math.PI/2,0)})}
 // ceiling LED panels
 for(let z=0;z>-L+2;z-=2.4)for(const x of [-0.95,0.95])plane(0.6,1.2,M.led,[x,CEIL-0.01,z-0.6],[Math.PI/2,0,0]);
 // tunnel mouth + stadium
@@ -962,12 +986,12 @@ boxM(HW*2+0.2,0.5,0.4,M.trim,[0,CEIL-0.25,-D-1]);
 const stad=plane(HW*2,CEIL,new THREE.MeshBasicMaterial({map:stadiumTex()}),[0,CEIL/2,-D-1.25]);stad.material.color.setScalar(2.4);
 const glow=new THREE.PointLight(0xdfe8ff,90,30,2);glow.position.set(0,1.8,-D-0.6);scene.add(glow);
 scene.add(new THREE.HemisphereLight(0x9fb4d0,0x0a0a0a,0.12));
-const spool=[];for(let k=0;k<10;k++){const l=new THREE.PointLight(0xffe7c4,1.6,2.2,2);scene.add(l);spool.push(l)}
+const spool=[];for(let k=0;k<10;k++){const l=new THREE.PointLight(0xffe7c4,2.4,2.6,2);scene.add(l);spool.push(l)}
 const pool=[];for(let k=0;k<8;k++){const l=new THREE.PointLight(0xf1f5ff,4.5,8,2);scene.add(l);pool.push(l)}
 
 /* ---------- post ---------- */
 const composer=new EffectComposer(renderer);composer.addPass(new RenderPass(scene,camera));
-const bloom=new UnrealBloomPass(new THREE.Vector2(1,1),0.28,0.3,0.95);composer.addPass(bloom);composer.addPass(new OutputPass());
+const bloom=new UnrealBloomPass(new THREE.Vector2(1,1),0.22,0.25,0.97);composer.addPass(bloom);composer.addPass(new OutputPass());
 function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);composer.setSize(w,h);camera.aspect=w/h;camera.fov=w<h?78:62;camera.updateProjectionMatrix()}
 addEventListener("resize",resize);resize();
 
@@ -992,11 +1016,11 @@ function tick(ts){
   pool.forEach((l,k)=>l.position.set(k%2?0.95:-0.95,CEIL-0.25,base-Math.floor(k/2)*2.4+1.8));
   hb.style.setProperty("--p",p);box.classList.toggle("running",p>0.02||RUN.done);
   if(p>=1&&!RUN.done){RUN.done=true;doneT=ts;try{navigator.vibrate&&navigator.vibrate(25)}catch(e){}}
-  if(RUN.done){const e=(ts-doneT)/1000;renderer.toneMappingExposure=1+Math.max(0,e-0.35)*Math.max(0,e-0.35)*7;if(e>0.65)cv.style.opacity=String(Math.max(0,1-(e-0.65)/0.35));if(e>=0.85&&!RUN.fired){RUN.fired=true;window.finishRun()}}
+  if(RUN.done){const e=(ts-doneT)/1000;renderer.toneMappingExposure=0.9+Math.max(0,e-0.35)*Math.max(0,e-0.35)*7;if(e>0.65)cv.style.opacity=String(Math.max(0,1-(e-0.65)/0.35));if(e>=0.85&&!RUN.fired){RUN.fired=true;window.finishRun()}}
   composer.render();
   requestAnimationFrame(tick);
 }
-addEventListener("run-reset",()=>{d=0;v=0;holdT=0;RUN.fired=false;renderer.toneMappingExposure=1;cv.style.opacity="1";if(paused){paused=false;last=0;requestAnimationFrame(tick)}});
+addEventListener("run-reset",()=>{d=0;v=0;holdT=0;RUN.fired=false;renderer.toneMappingExposure=0.9;cv.style.opacity="1";if(paused){paused=false;last=0;requestAnimationFrame(tick)}});
 composer.render();window.TUNNEL_OK=true;requestAnimationFrame(tick);
 </script>
 </body>
