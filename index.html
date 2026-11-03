@@ -379,8 +379,8 @@ $("#connectForm").addEventListener("submit",e=>e.preventDefault());
 /* hold-to-enter: input + fallback (3D scene lives in the module script) */
 const RUN={holding:false,p:0,done:false};window.RUN=RUN;
 const box=$(".gate-box"),hb=$("#holdBtn");
-function startHold(e){if(e)e.preventDefault();if(RUN.done)return;if(!$("#username").value.trim()){$("#gateErr").textContent="Enter your Sleeper username.";return}$("#gateErr").textContent="";RUN.holding=true}
-function endHold(){RUN.holding=false}
+function startHold(e){if(e)e.preventDefault();if(RUN.done)return;if(!$("#username").value.trim()){$("#gateErr").textContent="Enter your Sleeper username.";return}$("#gateErr").textContent="";if(!RUN.holding)RUN.holdStart=performance.now();RUN.holding=true}
+function endHold(){if(RUN.holding)RUN.holdAcc=(RUN.holdAcc||0)+performance.now()-RUN.holdStart;RUN.holding=false}
 hb.addEventListener("pointerdown",startHold);
 ["pointerup","pointercancel","pointerleave"].forEach(ev=>hb.addEventListener(ev,endHold));
 hb.addEventListener("contextmenu",e=>e.preventDefault());
@@ -388,7 +388,7 @@ addEventListener("blur",endHold);
 document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&!e.repeat&&!$("#gate").classList.contains("hidden"))startHold(e)});
 document.addEventListener("keyup",e=>{if(e.key==="Enter"||e.key===" ")endHold()});
 window.finishRun=function(){connect().then(ok=>{if(!ok)window.resetRun()})};
-window.resetRun=function(){RUN.done=false;RUN.p=0;RUN.holding=false;const c=$("#tunnel");c.classList.remove("hidden");c.style.opacity="1";box.classList.remove("running");hb.style.setProperty("--p",0);dispatchEvent(new Event("run-reset"))};
+window.resetRun=function(){RUN.holdAcc=0;RUN.done=false;RUN.p=0;RUN.holding=false;const c=$("#tunnel");c.classList.remove("hidden");c.style.opacity="1";box.classList.remove("running");hb.style.setProperty("--p",0);dispatchEvent(new Event("run-reset"))};
 let fbLast=0;
 function fallback(ts){if(window.TUNNEL_OK)return;const dt=Math.min(100,ts-(fbLast||ts));fbLast=ts;
   if(!RUN.done){if(RUN.holding)RUN.p=Math.min(1,RUN.p+dt/1500);hb.style.setProperty("--p",RUN.p);box.classList.toggle("running",RUN.p>0.03);if(RUN.p>=1){RUN.done=true;finishRun()}}
@@ -415,7 +415,7 @@ async function connect(){
     $("#leagueSel").innerHTML=leagues.map(l=>`<option value="${l.league_id}">${esc(l.name)}</option>`).join("");
     const saved=ls.get("sl_league",null);const pick=leagues.find(l=>l.league_id===saved)?saved:leagues[0].league_id;
     $("#leagueSel").value=pick;$("#leagueSel").classList.toggle("hidden",leagues.length<2);
-    $("#gate").classList.add("hidden");$("#tunnel").classList.add("hidden");RUN.done=false;RUN.holding=false;RUN.p=0;$("#app").classList.remove("hidden");
+    $("#gate").classList.add("hidden");$("#tunnel").classList.add("hidden");RUN.done=false;RUN.holding=false;RUN.p=0;RUN.holdAcc=0;$("#app").classList.remove("hidden");
     await loadLeague(pick);return true;
   }catch(e){$("#gate").classList.remove("hidden");err.textContent=(e instanceof TypeError)?"Couldn't reach Sleeper. This page has to be opened in a regular browser tab (Safari or Chrome), not an in-app file preview.":(e.message||String(e));return false}
 }
@@ -740,15 +740,19 @@ function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);c
 addEventListener("resize",resize);resize();
 
 /* ---------- run ---------- */
-const VMAX=13, RUN_D=D-7;let d=0,v=0,t=0,last=0,doneT=0,paused=false;
+const VMAX=13, RUN_D=D-7;let d=0,v=0,t=0,last=0,doneT=0,paused=false,ft=16,slow=0,lowQ=false,holdT=0;
 function tick(ts){
   if(cv.classList.contains("hidden")){paused=true;return}
-  const dt=Math.min(0.1,(ts-(last||ts))/1000);last=ts;t+=dt;
+  const rawMs=ts-(last||ts),dt=Math.min(0.5,rawMs/1000);last=ts;t+=dt;
+  // adaptive quality: drop resolution and glow if frames are slow
+  if(rawMs>0){ft=ft*0.9+rawMs*0.1;if(ft>45&&++slow>20&&!lowQ){lowQ=true;renderer.setPixelRatio(0.75);bloom.enabled=false;resize()}}
+  holdT=((RUN.holdAcc||0)+(RUN.holding&&RUN.holdStart?performance.now()-RUN.holdStart:0))/1000;
   if(!RUN.done){if(RUN.holding)v+=(VMAX-v)*Math.min(1,dt*1.5)+dt*1.2;else v=Math.max(0,v-dt*14);v=Math.min(v,VMAX)}
   else v=Math.min(VMAX*1.2,v+dt*6);
   if(reduce&&RUN.holding)v=0;
   d=Math.min(D+0.6,d+v*dt);
-  const p=reduce?Math.min(1,RUN.p+(RUN.holding?dt/1.5:0)):Math.min(1,d/RUN_D);RUN.p=p;
+  if(holdT>3.5&&d<RUN_D)d=RUN_D;
+  const p=reduce?Math.min(1,RUN.p+(RUN.holding?dt/1.5:0)):Math.min(1,Math.max(d/RUN_D,holdT/3.5));RUN.p=p;
   const run=v/VMAX,ph=t*(1.6+run*2.6)*Math.PI*2;
   camera.position.set(Math.sin(ph/2)*0.035*run,1.62+Math.abs(Math.sin(ph))*0.07*run+Math.sin(t*1.3)*0.006,1.2-d);
   camera.lookAt(Math.sin(ph/2)*0.02*run,1.58,-d-6);camera.rotation.z+=Math.sin(ph/2)*0.012*run;
@@ -760,7 +764,7 @@ function tick(ts){
   composer.render();
   requestAnimationFrame(tick);
 }
-addEventListener("run-reset",()=>{d=0;v=0;RUN.fired=false;renderer.toneMappingExposure=1;cv.style.opacity="1";if(paused){paused=false;last=0;requestAnimationFrame(tick)}});
+addEventListener("run-reset",()=>{d=0;v=0;holdT=0;RUN.fired=false;renderer.toneMappingExposure=1;cv.style.opacity="1";if(paused){paused=false;last=0;requestAnimationFrame(tick)}});
 composer.render();window.TUNNEL_OK=true;requestAnimationFrame(tick);
 </script>
 </body>
