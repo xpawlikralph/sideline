@@ -665,8 +665,22 @@ function openPlayer(pid){
     <div class="sheet-actions"><a class="primary" href="${xSearch(p)}" target="_blank" rel="noopener">Latest news on X</a>${doc?`<a href="${doc}" target="_blank" rel="noopener">Doctor read</a>`:""}</div></div>`;
   $("#sheet").classList.remove("hidden");$("#sheet .x").focus();
 }
+let twP=null;
+function loadTw(){if(twP)return twP;twP=new Promise((res,rej)=>{const sc=document.createElement("script");sc.src="https://platform.twitter.com/widgets.js";sc.async=true;sc.onload=()=>window.twttr&&twttr.ready?twttr.ready(()=>res(twttr)):res(window.twttr);sc.onerror=()=>{twP=null;rej(new Error("blocked"))};document.head.appendChild(sc)});return twP}
+function openWriter(w){
+  const url=`https://x.com/${encodeURIComponent(w.h)}`;
+  $("#sheet").innerHTML=`<div class="sheet" style="max-width:520px"><div class="sheet-top"><div class="avatar" style="width:52px;height:52px;background:#000;color:#fff;font-size:15px">${initials(w.n)}</div><div style="min-width:0"><h3>${esc(w.n)}</h3><div class="ps">@${esc(w.h)}${w.o?" · "+esc(w.o):""}</div></div><button class="x" aria-label="Close">×</button></div>
+    <div id="tl" style="margin:14px 0;min-height:240px;border-radius:14px;background:var(--bg);padding:6px;overflow:hidden"><div class="empty-state"><span class="spinner"></span>Loading latest posts from X</div></div>
+    <div class="sheet-actions"><a class="primary" href="${url}" target="_blank" rel="noopener">Open on X</a></div></div>`;
+  $("#sheet").classList.remove("hidden");
+  const box=$("#tl"),fail=msg=>{if(box.isConnected&&!box.querySelector("iframe"))box.innerHTML=`<div class="empty-state">${msg}</div>`};
+  const timer=setTimeout(()=>fail("X didn't send posts here. This usually means you're not signed in to X in this browser. Tap Open on X to read them there."),9000);
+  loadTw().then(tw=>tw.widgets.createTimeline({sourceType:"profile",screenName:w.h},box,{theme:"dark",tweetLimit:6,chrome:"noheader nofooter noborders transparent",dnt:true}))
+    .then(el=>{if(el){clearTimeout(timer);const sp=box.querySelector(".empty-state");if(sp)sp.remove()}})
+    .catch(()=>{clearTimeout(timer);fail("Your browser blocked X's embed (often a content blocker). Tap Open on X instead.")});
+}
 function closeSheet(){$("#sheet").classList.add("hidden")}
-document.addEventListener("click",e=>{const b=e.target.closest("[data-pid]");if(b){openPlayer(b.dataset.pid);return}if(e.target.id==="sheet"||e.target.closest("#sheet .x"))closeSheet()});
+document.addEventListener("click",e=>{const wb=e.target.closest("[data-wh]");if(wb){e.preventDefault();openWriter({h:wb.dataset.wh,n:wb.dataset.wn,o:wb.dataset.wo});return}const b=e.target.closest("[data-pid]");if(b){openPlayer(b.dataset.pid);return}if(e.target.id==="sheet"||e.target.closest("#sheet .x"))closeSheet()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeSheet()});
 function renderAll(){for(const k in MET)delete MET[k];const prof=teamProfiles();renderMid(prof);renderLeft(prof);renderRight()}
 const curRoster=()=>S.rosters.find(x=>x.roster_id===S.teamRosterId);
@@ -783,8 +797,8 @@ function renderRight(){
   const track=items.join("");
   const creds=order.map((t,i)=>{const c=tcol(t),ps=groups[t];return `<div class="cred" style="--t1:${c[0]};--t2:${c[1]};--r:${[-1.2,.9,-.6,1.1,-.9,.5][i%6]}deg"><div class="band">${teamLogo(t)}<b>${esc(TEAMS[t]||t)}</b></div><span class="hole"></span><span class="press-lbl">PRESS</span>
      <div class="who">${ps.map(p=>esc(shortName(p))).join(", ")}</div>
-     <div class="wl">${writersFor(t).map(w=>`<a class="w" href="https://x.com/${encodeURIComponent(w.h)}" target="_blank" rel="noopener">${xIcon}<b>${esc(w.n)}</b><small>${esc((w.o||"").replace("The Athletic","Athletic"))}</small></a>`).join("")||'<div class="who">No writers saved</div>'}</div></div>`}).join("");
-  const natl=NATIONAL.flatMap(g=>g.l).map(w=>`<a href="https://x.com/${encodeURIComponent(w.h)}" target="_blank" rel="noopener">${xIcon}${esc(w.n)}</a>`).join("");
+     <div class="wl">${writersFor(t).map(w=>`<a class="w" href="https://x.com/${encodeURIComponent(w.h)}" target="_blank" rel="noopener" data-wh="${esc(w.h)}" data-wn="${esc(w.n)}" data-wo="${esc(w.o||"")}">${xIcon}<b>${esc(w.n)}</b><small>${esc((w.o||"").replace("The Athletic","Athletic"))}</small></a>`).join("")||'<div class="who">No writers saved</div>'}</div></div>`}).join("");
+  const natl=NATIONAL.flatMap(g=>g.l).map(w=>`<a href="https://x.com/${encodeURIComponent(w.h)}" target="_blank" rel="noopener" data-wh="${esc(w.h)}" data-wn="${esc(w.n)}" data-wo="${esc(w.o||"")}">${xIcon}${esc(w.n)}</a>`).join("");
 
   // medical tent
   const slots=(S.league.settings||{}).reserve_slots||0,elig=irEligible(),reserve=r.reserve||[];
