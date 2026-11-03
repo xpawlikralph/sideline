@@ -974,7 +974,7 @@ function stadiumTex(){return tex(2048,1536,(g0)=>{g0.scale(2,2);((g,w,h)=>{
   g.fillStyle="rgba(255,255,255,.9)";[.58,.7,.86].forEach(t=>g.fillRect(0,h*t,w,3));})(g0,1024,768)})}
 
 /* ---------- geometry ---------- */
-const HW=innerWidth<innerHeight?1.6:2.15, CEIL=3.25, SW=0.95, D=36, DEP=0.62;
+const HW=innerWidth<innerHeight?1.6:2.15, CEIL=3.25, SW=0.95, D=36, DEP=0.52;
 const M={
   wood:new THREE.MeshStandardMaterial({map:wood,roughness:.55,envMapIntensity:0.15}),
   woodDark:new THREE.MeshStandardMaterial({map:woodDark,roughness:.5,envMapIntensity:0.15}),
@@ -1073,11 +1073,11 @@ const ezm=new THREE.Mesh(new THREE.PlaneGeometry(FW,9.1),basic({map:ez}));ezm.ro
 const tierGeo=new THREE.BoxGeometry(1,0.6,0.9),fanGeo=new THREE.BoxGeometry(0.42,0.55,0.32);
 const tierMat=basic({color:0x1b212c}),fanMat=basic({color:0xffffff});
 const sections=[{ox:-(FW/2+8),dir:[-1,0],len:FL+10,cz:fz,rot:0},{ox:(FW/2+8),dir:[1,0],len:FL+10,cz:fz,rot:0},{oz:fz-FL/2-10,dir:[0,-1],len:FW+30,cx:0,rot:1}];
-const ROWS=26,palette=[0x00ceb8,0x1c2944,0xe9edf3,0x00a896,0x24324f,0xfc2b6d,0x59a7ff,0xdfe5ef,0x0e1524,0x33415e];
+const ROWS=46,palette=[0x00ceb8,0x1c2944,0xe9edf3,0x00a896,0x24324f,0xfc2b6d,0x59a7ff,0xdfe5ef,0x0e1524,0x33415e];
 let tierCount=0,fanCount=0;for(const sec of sections){tierCount+=ROWS;fanCount+=ROWS*Math.floor(sec.len/0.55)}
 const tiers=new THREE.InstancedMesh(tierGeo,tierMat,tierCount),fans=new THREE.InstancedMesh(fanGeo,fanMat,fanCount);
 let ti=0,fi=0;const col=new THREE.Color(),dd=new THREE.Object3D();
-for(const sec of sections){for(let r=0;r<ROWS;r++){const out=3+r*0.9,y=0.6+r*0.62;
+for(const sec of sections){for(let r=0;r<ROWS;r++){const deck=r>=24?1:0,out=3+r*0.9+deck*4,y=0.6+r*0.66+deck*3.5;
   if(sec.rot){dd.position.set(sec.cx,y-0.3,sec.oz-out);dd.scale.set(sec.len,1,1);dd.rotation.set(0,0,0)}else{dd.position.set(sec.ox+sec.dir[0]*out,y-0.3,sec.cz);dd.scale.set(1,1,sec.len/0.9);dd.rotation.set(0,0,0)}
   dd.updateMatrix();tiers.setMatrixAt(ti++,dd.matrix);dd.scale.set(1,1,1);
   const n=Math.floor(sec.len/0.55);for(let k=0;k<n;k++){if(rnd()<0.06)continue;const off=-sec.len/2+k*0.55+rnd()*0.12,jit=(rnd()-.5)*0.06;
@@ -1087,12 +1087,21 @@ fans.count=fi;fans.instanceMatrix.needsUpdate=true;if(fans.instanceColor)fans.in
 // upper rim + ribbon board
 for(const sec of sections){const g2=new THREE.Mesh(new THREE.BoxGeometry(sec.rot?sec.len:1.2,1.6,sec.rot?1.2:sec.len),basic({color:0x00ceb8}));
   if(sec.rot)g2.position.set(sec.cx,1.2,sec.oz-2.2);else g2.position.set(sec.ox+sec.dir[0]*2.2,1.2,sec.cz);g2.material.color.multiplyScalar(0.85);scene.add(g2)}
+// lit ring along the top of every stand
+const ringMat=basic({color:0xffffff});ringMat.color.setScalar(3.2);
+for(const sec of sections){const top=0.6+(ROWS-1)*0.66+3.5+1.4,outT=3+(ROWS-1)*0.9+4+0.6;const rg2=new THREE.Mesh(new THREE.BoxGeometry(sec.rot?sec.len:0.4,0.35,sec.rot?0.4:sec.len),ringMat);
+  if(sec.rot)rg2.position.set(sec.cx,top,sec.oz-outT);else rg2.position.set(sec.ox+sec.dir[0]*outT,top,sec.cz);scene.add(rg2);
+  const fascia=new THREE.Mesh(new THREE.BoxGeometry(sec.rot?sec.len:0.5,2.2,sec.rot?0.5:sec.len),basic({color:0x0e1524}));
+  const fy=0.6+23*0.66+1.9,fo=3+23*0.9+2.2;if(sec.rot)fascia.position.set(sec.cx,fy,sec.oz-fo);else fascia.position.set(sec.ox+sec.dir[0]*fo,fy,sec.cz);scene.add(fascia);
+  const rib=new THREE.Mesh(new THREE.BoxGeometry(sec.rot?sec.len:0.52,0.5,sec.rot?0.52:sec.len),basic({color:0x00ceb8}));rib.material.color.multiplyScalar(1.6);rib.position.copy(fascia.position);rib.position.y+=0.5;scene.add(rib)}
+const glowTex=tex(128,128,(g,w,h)=>{const gr=g.createRadialGradient(64,64,0,64,64,64);gr.addColorStop(0,"rgba(255,255,255,1)");gr.addColorStop(.25,"rgba(230,240,255,.55)");gr.addColorStop(1,"rgba(200,220,255,0)");g.fillStyle=gr;g.fillRect(0,0,w,h)});
 // light towers
 const poleMat=basic({color:0x2a3140}),lampMat=basic({color:0xffffff});lampMat.color.setScalar(6);
-for(const [x,z] of [[-FW/2-30,Z0-16],[FW/2+30,Z0-16],[-FW/2-30,fz-FL/2+6],[FW/2+30,fz-FL/2+6]]){const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.7,34,10),poleMat);pole.position.set(x,17,z);scene.add(pole);
-  const bank=new THREE.Mesh(new THREE.BoxGeometry(8,4,0.4),lampMat);bank.position.set(x*0.96,35,z);bank.lookAt(0,0,fz);scene.add(bank)}
+for(const [x,z] of [[-FW/2-52,Z0-14],[FW/2+52,Z0-14],[-FW/2-52,fz],[FW/2+52,fz],[-FW/2-52,fz-FL/2+4],[FW/2+52,fz-FL/2+4]]){const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.7,1,58,10),poleMat);pole.position.set(x,29,z);scene.add(pole);
+  const bank=new THREE.Mesh(new THREE.BoxGeometry(12,6,0.5),lampMat);bank.position.set(x*0.98,60,z);bank.lookAt(0,0,fz);scene.add(bank);
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0xdfe9ff,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,fog:false}));sp.scale.set(70,70,1);sp.position.copy(bank.position);scene.add(sp)}
 // night sky
-const skyTex=tex(64,512,(g,w,h)=>{const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,"#03060d");gr.addColorStop(.55,"#0b1730");gr.addColorStop(.8,"#24365a");gr.addColorStop(1,"#3b4f78");g.fillStyle=gr;g.fillRect(0,0,w,h)});
+const skyTex=tex(64,512,(g,w,h)=>{const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,"#050a16");gr.addColorStop(.42,"#0c1a36");gr.addColorStop(.5,"#1d3358");gr.addColorStop(.56,"#4a6a96");gr.addColorStop(.62,"#22385c");gr.addColorStop(1,"#0a1222");g.fillStyle=gr;g.fillRect(0,0,w,h)});
 const sky=new THREE.Mesh(new THREE.SphereGeometry(260,32,16),basic({map:skyTex,side:THREE.BackSide}));sky.position.set(0,0,fz);scene.add(sky);
 const glow=new THREE.PointLight(0xdfe8ff,60,22,2);glow.position.set(0,2.2,Z0-1.2);scene.add(glow);
 scene.add(new THREE.HemisphereLight(0x9fb4d0,0x0a0a0a,0.12));
