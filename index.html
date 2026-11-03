@@ -437,7 +437,7 @@ body{background:radial-gradient(1100px 520px at 50% -160px,rgba(0,206,184,.17),t
 /* ====== collapsible sections (phones) ====== */
 .chev,.sec-h .sum{display:none}
 @media (max-width:760px){
-  .sec-h{cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+  .sec-h{cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation}
   .chev{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.06);margin-left:8px;flex:none;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
   .canopy .chev{background:#eef1f5;margin-left:8px;width:22px;height:22px}
   .sec.collapsed .chev{transform:rotate(-90deg)}
@@ -515,6 +515,8 @@ body{background:radial-gradient(1100px 520px at 50% -160px,rgba(0,206,184,.17),t
 
 <script>
 "use strict";
+const BUILD="20261103160756";
+(function checkUpdate(){try{fetch(location.pathname+"?b="+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.text():"").then(t=>{const m=t.match(/const BUILD="(\d+)"/);if(m&&m[1]!==BUILD&&sessionStorage.getItem("sl_reloaded")!==m[1]){sessionStorage.setItem("sl_reloaded",m[1]);location.reload()}}).catch(()=>{})}catch(e){}})();
 const API="https://api.sleeper.app/v1", CDN="https://sleepercdn.com";
 const SKILL=["QB","RB","WR","TE"], IR_ALWAYS=["IR","PUP"];
 
@@ -613,7 +615,7 @@ window.finishRun=function(){connect().then(ok=>{if(!ok)window.resetRun()})};
 window.resetRun=function(){RUN.holdAcc=0;RUN.done=false;RUN.p=0;RUN.holding=false;const c=$("#tunnel");c.classList.remove("hidden");c.style.opacity="1";box.classList.remove("running");hb.style.setProperty("--p",0);dispatchEvent(new Event("run-reset"))};
 let fbLast=0;
 function fallback(ts){if(window.TUNNEL_OK)return;const dt=Math.min(100,ts-(fbLast||ts));fbLast=ts;
-  if(!RUN.done){if(RUN.holding)RUN.p=Math.min(1,RUN.p+dt/1500);hb.style.setProperty("--p",RUN.p);box.classList.toggle("running",RUN.p>0.03);if(RUN.p>=1){RUN.done=true;finishRun()}}
+  if(!RUN.done){if(RUN.holding)RUN.p=Math.min(1,RUN.p+dt/1200);hb.style.setProperty("--p",RUN.p);box.classList.toggle("running",RUN.p>0.03);if(RUN.p>=1){RUN.done=true;finishRun()}}
   requestAnimationFrame(fallback)}
 requestAnimationFrame(fallback);
 
@@ -741,11 +743,10 @@ function introAnim(){const app=$("#app");app.classList.remove("intro");void app.
   for(const sel of [".bench-row .token",".tcard",".machine",".cred",".chart",".wait",".bed",".scout .ring"])document.querySelectorAll(sel).forEach((el,i)=>el.style.setProperty("--i",i));
   document.querySelectorAll("[data-count]").forEach(el=>{const to=parseFloat(el.dataset.count),dec=+el.dataset.dec||0,t0=performance.now()+300;const step=t=>{const k=Math.max(0,Math.min(1,(t-t0)/1200)),e=1-Math.pow(1-k,3);el.textContent=(to*e).toFixed(dec);if(k<1)requestAnimationFrame(step)};requestAnimationFrame(step)});
   clearTimeout(introAnim.t);introAnim.t=setTimeout(()=>app.classList.remove("intro"),4200)}
-function applyCollapsed(){const c=ls.get("sl_collapsed",{});document.querySelectorAll(".sec[data-sec]").forEach(el=>el.classList.toggle("collapsed",!!c[el.dataset.sec]))}
+function applyCollapsed(){const c=ls.get("sl_collapsed",{});document.querySelectorAll(".sec[data-sec]").forEach(el=>{el.classList.toggle("collapsed",!!c[el.dataset.sec]);const h=el.querySelector(".sec-h");if(h&&!h._wired){h._wired=true;h.setAttribute("onclick","void 0");h.addEventListener("click",e=>{if(e.target.closest("a,input,select,[data-pid],button:not(.sec-h)"))return;e.stopPropagation();toggleSec(h)})}})}
 function renderAll(){for(const k in MET)delete MET[k];const prof=teamProfiles();renderMid(prof);renderLeft(prof);renderRight();applyCollapsed()}
-const isPhone=()=>matchMedia("(max-width:760px)").matches;
+const isPhone=()=>innerWidth<=760;
 function toggleSec(h){if(!isPhone())return;const sec=h.closest(".sec");if(!sec)return;const c=ls.get("sl_collapsed",{});c[sec.dataset.sec]=!sec.classList.contains("collapsed");ls.set("sl_collapsed",c);sec.classList.toggle("collapsed",c[sec.dataset.sec]);if(!c[sec.dataset.sec])setTimeout(()=>sec.scrollIntoView({behavior:"smooth",block:"nearest"}),200)}
-document.addEventListener("click",e=>{const h=e.target.closest(".sec-h");if(h&&!e.target.closest("a,button:not(.sec-h),input,select,[data-pid]")){toggleSec(h)}});
 document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.classList&&e.target.classList.contains("sec-h")){e.preventDefault();toggleSec(e.target)}});
 const curRoster=()=>S.rosters.find(x=>x.roster_id===S.teamRosterId);
 const TC={ARI:["#97233F","#000000"],ATL:["#A71930","#000000"],BAL:["#241773","#9E7C0C"],BUF:["#00338D","#C60C30"],CAR:["#0085CA","#101820"],CHI:["#0B162A","#C83803"],CIN:["#FB4F14","#000000"],CLE:["#311D00","#FF3C00"],DAL:["#003594","#869397"],DEN:["#FB4F14","#002244"],DET:["#0076B6","#B0B7BC"],GB:["#203731","#FFB612"],HOU:["#03202F","#A71930"],IND:["#002C5F","#A2AAAD"],JAX:["#006778","#D7A22A"],KC:["#E31837","#FFB81C"],LV:["#000000","#A5ACAF"],LAC:["#0080C6","#FFC20E"],LAR:["#003594","#FFA300"],MIA:["#008E97","#FC4C02"],MIN:["#4F2683","#FFC62F"],NE:["#002244","#C60C30"],NO:["#9F8958","#101820"],NYG:["#0B2265","#A71930"],NYJ:["#125740","#000000"],PHI:["#004C54","#A5ACAF"],PIT:["#FFB612","#101820"],SF:["#AA0000","#B3995D"],SEA:["#002244","#69BE28"],TB:["#D50A0A","#34302B"],TEN:["#4B92DB","#0C2340"],WAS:["#5A1414","#FFB612"]};
@@ -1005,7 +1006,7 @@ function stadiumTex(){return tex(2048,1536,(g0)=>{g0.scale(2,2);((g,w,h)=>{
   g.fillStyle="rgba(255,255,255,.9)";[.58,.7,.86].forEach(t=>g.fillRect(0,h*t,w,3));})(g0,1024,768)})}
 
 /* ---------- geometry ---------- */
-const HW=innerWidth<innerHeight?1.6:2.15, CEIL=3.25, SW=0.95, D=36, DEP=0.52;
+const HW=innerWidth<innerHeight?1.6:2.15, CEIL=3.25, SW=0.95, D=24, DEP=0.52;
 const M={
   wood:new THREE.MeshStandardMaterial({map:wood,roughness:.55,envMapIntensity:0.15}),
   woodDark:new THREE.MeshStandardMaterial({map:woodDark,roughness:.5,envMapIntensity:0.15}),
@@ -1147,7 +1148,7 @@ function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);c
 addEventListener("resize",resize);resize();
 
 /* ---------- run ---------- */
-const VMAX=13, RUN_D=D-7;
+const VMAX=13, RUN_D=D-6;
 window.__sl={freeze:false,get d(){return d},set d(x){d=x}};let d=0,v=0,t=0,last=0,doneT=0,paused=false,ft=16,slow=0,lowQ=false,holdT=0;
 function tick(ts){
   if(cv.classList.contains("hidden")){paused=true;return}
@@ -1156,21 +1157,21 @@ function tick(ts){
   // adaptive quality: drop resolution and glow if frames are slow
   if(rawMs>0){ft=ft*0.9+rawMs*0.1;if(ft>45&&++slow>30&&!lowQ){lowQ=true;renderer.setPixelRatio(1);resize()}}
   holdT=((RUN.holdAcc||0)+(RUN.holding&&RUN.holdStart?performance.now()-RUN.holdStart:0))/1000;
-  if(window.__sl.freeze){v=0}else if(!RUN.done){if(RUN.holding)v+=(VMAX-v)*Math.min(1,dt*1.5)+dt*1.2;else v=Math.max(0,v-dt*14);v=Math.min(v,VMAX)}
-  else v=Math.max(7,Math.min(VMAX,v+dt*4));
+  if(window.__sl.freeze){v=0}else if(!RUN.done){if(RUN.holding)v+=(VMAX-v)*Math.min(1,dt*2.2)+dt*2;else v=Math.max(0,v-dt*14);v=Math.min(v,VMAX)}
+  else v=Math.max(9,Math.min(VMAX,v+dt*4));
   if(reduce&&RUN.holding)v=0;
-  if(!window.__sl.freeze)d=Math.min(RUN.done?D+14:D-0.5,d+v*dt);
-  if(holdT>3.5&&d<RUN_D)d=RUN_D;
-  const p=reduce?Math.min(1,RUN.p+(RUN.holding?dt/1.5:0)):Math.min(1,Math.max(d/RUN_D,holdT/3.5));RUN.p=p;
+  if(!window.__sl.freeze)d=Math.min(RUN.done?D+10:D-0.5,d+v*dt);
+  if(holdT>2.4&&d<RUN_D)d=RUN_D;
+  const p=reduce?Math.min(1,RUN.p+(RUN.holding?dt/1.5:0)):Math.min(1,Math.max(d/RUN_D,holdT/2.4));RUN.p=p;
   const run=v/VMAX,ph=t*(1.6+run*2.6)*Math.PI*2;
-  const out=Math.max(0,d-(D+1.2))/12,ease=out*out*(3-2*out);
+  const out=Math.min(1,Math.max(0,d-(D+1.2))/8.5),ease=out*out*(3-2*out);
   camera.position.set(Math.sin(ph/2)*0.035*run,(PORT?1.5:1.62)+Math.abs(Math.sin(ph))*0.07*run*(1-ease)+Math.sin(t*1.3)*0.006+ease*1.6,1.2-d);
   camera.lookAt(Math.sin(ph/2)*0.02*run+ease*3,(PORT?1.3:1.58)+ease*7,-d-6-ease*10);camera.rotation.z+=Math.sin(ph/2)*0.012*run;
   const base=Math.floor((1.2-d)/2.4)*2.4;const sb=Math.floor((1.2-d)/SW);spool.forEach((l,k)=>{const i=-(sb)+Math.floor(k/2);l.position.set((k%2?1:-1)*(HW-DEP/2),1.85,zOf(Math.max(0,i)))});
   pool.forEach((l,k)=>l.position.set(k%2?HW*0.44:-HW*0.44,CEIL-0.25,base-Math.floor(k/2)*2.4+1.8));
   hb.style.setProperty("--p",p);box.classList.toggle("running",p>0.02||RUN.done);
   if(p>=1&&!RUN.done){RUN.done=true;doneT=ts;try{navigator.vibrate&&navigator.vibrate(25)}catch(e){}}
-  if(RUN.done&&!window.__sl.freeze){const e=(ts-doneT)/2200;renderer.toneMappingExposure=0.9+Math.max(0,e-0.7)*1.4;if(e>0.78)cv.style.opacity=String(Math.max(0,1-(e-0.78)/0.22));if(e>=0.9&&!RUN.fired){RUN.fired=true;window.finishRun()}}
+  if(RUN.done&&!window.__sl.freeze){const e=(ts-doneT)/1500;renderer.toneMappingExposure=0.9+Math.max(0,e-0.7)*1.4;if(e>0.78)cv.style.opacity=String(Math.max(0,1-(e-0.78)/0.22));if(e>=0.9&&!RUN.fired){RUN.fired=true;window.finishRun()}}
   composer.render();
   requestAnimationFrame(tick);
 }
