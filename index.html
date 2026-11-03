@@ -1103,27 +1103,28 @@ const pool=[];for(let k=0;k<8;k++){const l=new THREE.PointLight(0xf1f5ff,4.5,8,2
 const rt=new THREE.WebGLRenderTarget(innerWidth,innerHeight,{type:THREE.HalfFloatType,samples:renderer.capabilities.isWebGL2?4:0});
 const composer=new EffectComposer(renderer,rt);composer.setPixelRatio(Math.min(devicePixelRatio,2));composer.addPass(new RenderPass(scene,camera));
 const bloom=new UnrealBloomPass(new THREE.Vector2(1,1),0.22,0.25,0.97);composer.addPass(bloom);composer.addPass(new OutputPass());
-function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);composer.setPixelRatio(renderer.getPixelRatio());composer.setSize(w,h);camera.aspect=w/h;camera.fov=w<h?78:62;camera.updateProjectionMatrix()}
+function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);composer.setPixelRatio(renderer.getPixelRatio());composer.setSize(w,h);camera.aspect=w/h;PORT=w<h;camera.fov=PORT?72:62;camera.updateProjectionMatrix()}
 addEventListener("resize",resize);resize();
 
 /* ---------- run ---------- */
-const VMAX=13, RUN_D=D-7;let d=0,v=0,t=0,last=0,doneT=0,paused=false,ft=16,slow=0,lowQ=false,holdT=0;
+let PORT=false;const VMAX=13, RUN_D=D-7;
+window.__sl={freeze:false,get d(){return d},set d(x){d=x}};let d=0,v=0,t=0,last=0,doneT=0,paused=false,ft=16,slow=0,lowQ=false,holdT=0;
 function tick(ts){
   if(cv.classList.contains("hidden")){paused=true;return}
   const rawMs=ts-(last||ts),dt=Math.min(0.5,rawMs/1000);last=ts;t+=dt;
   // adaptive quality: drop resolution and glow if frames are slow
   if(rawMs>0){ft=ft*0.9+rawMs*0.1;if(ft>45&&++slow>30&&!lowQ){lowQ=true;renderer.setPixelRatio(1);resize()}}
   holdT=((RUN.holdAcc||0)+(RUN.holding&&RUN.holdStart?performance.now()-RUN.holdStart:0))/1000;
-  if(!RUN.done){if(RUN.holding)v+=(VMAX-v)*Math.min(1,dt*1.5)+dt*1.2;else v=Math.max(0,v-dt*14);v=Math.min(v,VMAX)}
+  if(window.__sl.freeze){v=0}else if(!RUN.done){if(RUN.holding)v+=(VMAX-v)*Math.min(1,dt*1.5)+dt*1.2;else v=Math.max(0,v-dt*14);v=Math.min(v,VMAX)}
   else v=Math.max(7,Math.min(VMAX,v+dt*4));
   if(reduce&&RUN.holding)v=0;
-  d=Math.min(RUN.done?D+14:D-0.5,d+v*dt);
+  if(!window.__sl.freeze)d=Math.min(RUN.done?D+14:D-0.5,d+v*dt);
   if(holdT>3.5&&d<RUN_D)d=RUN_D;
   const p=reduce?Math.min(1,RUN.p+(RUN.holding?dt/1.5:0)):Math.min(1,Math.max(d/RUN_D,holdT/3.5));RUN.p=p;
   const run=v/VMAX,ph=t*(1.6+run*2.6)*Math.PI*2;
   const out=Math.max(0,d-(D+1.2))/12,ease=out*out*(3-2*out);
-  camera.position.set(Math.sin(ph/2)*0.035*run,1.62+Math.abs(Math.sin(ph))*0.07*run*(1-ease)+Math.sin(t*1.3)*0.006+ease*1.6,1.2-d);
-  camera.lookAt(Math.sin(ph/2)*0.02*run+ease*3,1.58+ease*7,-d-6-ease*10);camera.rotation.z+=Math.sin(ph/2)*0.012*run;
+  camera.position.set(Math.sin(ph/2)*0.035*run,(PORT?1.5:1.62)+Math.abs(Math.sin(ph))*0.07*run*(1-ease)+Math.sin(t*1.3)*0.006+ease*1.6,1.2-d);
+  camera.lookAt(Math.sin(ph/2)*0.02*run+ease*3,(PORT?1.3:1.58)+ease*7,-d-6-ease*10);camera.rotation.z+=Math.sin(ph/2)*0.012*run;
   const base=Math.floor((1.2-d)/2.4)*2.4;const sb=Math.floor((1.2-d)/SW);spool.forEach((l,k)=>{const i=-(sb)+Math.floor(k/2);l.position.set((k%2?1:-1)*(HW-DEP/2),1.85,zOf(Math.max(0,i)))});
   pool.forEach((l,k)=>l.position.set(k%2?0.95:-0.95,CEIL-0.25,base-Math.floor(k/2)*2.4+1.8));
   hb.style.setProperty("--p",p);box.classList.toggle("running",p>0.02||RUN.done);
