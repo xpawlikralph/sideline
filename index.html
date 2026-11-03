@@ -433,6 +433,29 @@ body{background:radial-gradient(1100px 520px at 50% -160px,rgba(0,206,184,.17),t
 .intro .chart,.intro .wait,.intro .bed{animation:panelIn .5s ease-out both;animation-delay:calc(1s + var(--i,0)*.06s)}
 .intro .scout .ring{animation:panelIn .5s ease-out both;animation-delay:calc(.3s + var(--i,0)*.06s)}
 @media (prefers-reduced-motion:reduce){.intro *{animation:none!important}}
+
+/* ====== collapsible sections (phones) ====== */
+.chev,.sec-h .sum{display:none}
+@media (max-width:760px){
+  .sec-h{cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+  .chev{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.06);margin-left:8px;flex:none;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+  .canopy .chev{background:#eef1f5;margin-left:8px;width:22px;height:22px}
+  .sec.collapsed .chev{transform:rotate(-90deg)}
+  .sec-b{display:grid;grid-template-rows:1fr;transition:grid-template-rows .35s cubic-bezier(.2,.8,.2,1),opacity .25s}
+  .sec-in{min-height:0;overflow:hidden}
+  .sec.collapsed > .sec-b{grid-template-rows:0fr;opacity:0}
+  .sec.collapsed .sec-h .sum{display:inline}
+  .sec.collapsed .sec-h.hdr-team{padding-bottom:16px}
+  .sec.collapsed .canopy{height:58px}
+  .sec.collapsed .canopy::after{bottom:-12px}
+  .war .sec + .sec{border-top:1px solid var(--line)}
+  .sec-h h2{white-space:nowrap}
+  .sec-h .note{font-size:11px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+  .sec.collapsed .sec-h .note{font-size:0}
+  .sec.collapsed .sec-h .note .sum{font-size:12px;color:var(--muted)}
+  .sec.collapsed .sec-h .note .sum::first-letter{visibility:hidden}
+  .sec.collapsed .cards,.sec.collapsed .creds{visibility:hidden}
+}
 /* mobile: bottom tab bar like the app */
 .tabbar{display:none}
 @media (max-width:860px){
@@ -718,7 +741,12 @@ function introAnim(){const app=$("#app");app.classList.remove("intro");void app.
   for(const sel of [".bench-row .token",".tcard",".machine",".cred",".chart",".wait",".bed",".scout .ring"])document.querySelectorAll(sel).forEach((el,i)=>el.style.setProperty("--i",i));
   document.querySelectorAll("[data-count]").forEach(el=>{const to=parseFloat(el.dataset.count),dec=+el.dataset.dec||0,t0=performance.now()+300;const step=t=>{const k=Math.max(0,Math.min(1,(t-t0)/1200)),e=1-Math.pow(1-k,3);el.textContent=(to*e).toFixed(dec);if(k<1)requestAnimationFrame(step)};requestAnimationFrame(step)});
   clearTimeout(introAnim.t);introAnim.t=setTimeout(()=>app.classList.remove("intro"),4200)}
-function renderAll(){for(const k in MET)delete MET[k];const prof=teamProfiles();renderMid(prof);renderLeft(prof);renderRight()}
+function applyCollapsed(){const c=ls.get("sl_collapsed",{});document.querySelectorAll(".sec[data-sec]").forEach(el=>el.classList.toggle("collapsed",!!c[el.dataset.sec]))}
+function renderAll(){for(const k in MET)delete MET[k];const prof=teamProfiles();renderMid(prof);renderLeft(prof);renderRight();applyCollapsed()}
+const isPhone=()=>matchMedia("(max-width:760px)").matches;
+function toggleSec(h){if(!isPhone())return;const sec=h.closest(".sec");if(!sec)return;const c=ls.get("sl_collapsed",{});c[sec.dataset.sec]=!sec.classList.contains("collapsed");ls.set("sl_collapsed",c);sec.classList.toggle("collapsed",c[sec.dataset.sec]);if(!c[sec.dataset.sec])setTimeout(()=>sec.scrollIntoView({behavior:"smooth",block:"nearest"}),200)}
+document.addEventListener("click",e=>{const h=e.target.closest(".sec-h");if(h&&!e.target.closest("a,button:not(.sec-h),input,select,[data-pid]")){toggleSec(h)}});
+document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.classList&&e.target.classList.contains("sec-h")){e.preventDefault();toggleSec(e.target)}});
 const curRoster=()=>S.rosters.find(x=>x.roster_id===S.teamRosterId);
 const TC={ARI:["#97233F","#000000"],ATL:["#A71930","#000000"],BAL:["#241773","#9E7C0C"],BUF:["#00338D","#C60C30"],CAR:["#0085CA","#101820"],CHI:["#0B162A","#C83803"],CIN:["#FB4F14","#000000"],CLE:["#311D00","#FF3C00"],DAL:["#003594","#869397"],DEN:["#FB4F14","#002244"],DET:["#0076B6","#B0B7BC"],GB:["#203731","#FFB612"],HOU:["#03202F","#A71930"],IND:["#002C5F","#A2AAAD"],JAX:["#006778","#D7A22A"],KC:["#E31837","#FFB81C"],LV:["#000000","#A5ACAF"],LAC:["#0080C6","#FFC20E"],LAR:["#003594","#FFA300"],MIA:["#008E97","#FC4C02"],MIN:["#4F2683","#FFC62F"],NE:["#002244","#C60C30"],NO:["#9F8958","#101820"],NYG:["#0B2265","#A71930"],NYJ:["#125740","#000000"],PHI:["#004C54","#A5ACAF"],PIT:["#FFB612","#101820"],SF:["#AA0000","#B3995D"],SEA:["#002244","#69BE28"],TB:["#D50A0A","#34302B"],TEN:["#4B92DB","#0C2340"],WAS:["#5A1414","#FFB612"]};
 const tcol=t=>(TC[t]||["#3a4458","#1d2434"]);
@@ -750,9 +778,10 @@ function renderMid(prof){
     const list=spots[slot];if(list){const k=used2[slot]=(used2[slot]||0);used2[slot]++;const xy=list[k%list.length];onField.push(token(pid,lbl,xy[0],xy[1]))}else special.push(token(pid,lbl,null,null))});
   const benchIds=(r.players||[]).filter(pid=>!starters.includes(pid)&&!(r.reserve||[]).includes(pid)&&!(r.taxi||[]).includes(pid)).sort((a,b)=>metric(b).value-metric(a).value);
   const rings=SKILL.map(pos=>`<div class="ring">${ringSvg(me.rank[pos],n,`var(--${pos})`)}<div class="lbl pos ${pos}">${pos}</div><div class="of">${ord(me.rank[pos])} of ${n}</div></div>`).join("");
-  $("#colMid").innerHTML=`<div class="panel-t">
-    <div class="hdr-team"><div class="avatar">${av}</div><div style="min-width:0"><div class="tn">${esc(teamName(r))}</div><div class="ps">${esc(u.display_name||"")}</div></div>
-      <div class="rec"><b>${st.wins||0}-${st.losses||0}${st.ties?"-"+st.ties:""}</b><span>${ord(rank)} of ${n}</span></div></div>
+  $("#colMid").innerHTML=`<div class="panel-t sec" data-sec="team">
+    <div class="hdr-team sec-h" role="button" tabindex="0"><div class="avatar">${av}</div><div style="min-width:0"><div class="tn">${esc(teamName(r))}</div><div class="ps">${esc(u.display_name||"")}</div></div>
+      <div class="rec"><b>${st.wins||0}-${st.losses||0}${st.ties?"-"+st.ties:""}</b><span>${ord(rank)} of ${n}</span></div><span class="chev" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div>
+    <div class="sec-b"><div class="sec-in">
     <div class="chipsline"><span class="pillstat"><b data-count="${pts(r).toFixed(1)}" data-dec="1">${pts(r).toFixed(1)}</b> pts for</span><span class="pillstat">IR <b style="color:${used<slots?"var(--teal)":"inherit"}">${used<slots?`${slots-used} open`:"full"}</b></span><span class="pillstat">Deadline <b>${dl&&dl<99?"wk "+dl:"none"}</b>${dl&&dl<99&&dl>=S.week?`, ${dl-S.week} to go`:""}</span></div>
     <div class="scout">${rings}</div>
     <div class="field-wrap">
@@ -760,7 +789,7 @@ function renderMid(prof){
       ${special.length?`<div class="st-row">${special.join("")}</div>`:""}
       <div class="bench"><span class="lab">BENCH</span><div class="bench-row">${benchIds.map(pid=>token(pid,"",null,null)).join("")||'<div class="ps" style="padding:8px">Empty bench</div>'}</div></div>
       ${(r.reserve||[]).length?`<div class="ir-strip"><span class="lab">INJURED RESERVE</span><div class="bench-row">${r.reserve.map(pid=>token(pid,"IR",null,null)).join("")}</div></div>`:""}
-    </div></div>`;
+    </div></div></div></div>`;
 }
 
 function buildIdeas(prof){
@@ -807,10 +836,10 @@ function renderLeft(prof){
         <div class="mcol give"><span class="lab">YOU GIVE</span>${x.give.map(mp).join("")}</div></div>
       <div class="gauge"><i style="left:${pos}%"></i></div><div class="gauge-l"><span>They win</span><span>Fair</span><span>You win</span></div></div>`}).join("");
   $("#colLeft").innerHTML=`<div class="panel-t war">
-     <div class="ptitle"><div class="ico" style="background:rgba(0,206,184,.15)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00ceb8" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg></div><h2>Trade targets</h2><span class="note">Upgrades at ${targetPos.join(", ")}</span></div>
-     <div class="cards">${cards||'<div class="empty-state">Your lineup is balanced. Nobody is a clear upgrade.</div>'}</div>
-     <div class="ptitle" style="padding-top:4px"><div class="ico" style="background:rgba(89,167,255,.15)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#59a7ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></svg></div><h2>Trade machine</h2><span class="note">Best deal with each team</span></div>
-     ${deals||'<div class="empty-state">No deals line up yet.</div>'}
+     <div class="sec" data-sec="targets"><div class="ptitle sec-h" role="button" tabindex="0"><div class="ico" style="background:rgba(0,206,184,.15)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00ceb8" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg></div><h2>Trade targets</h2><span class="note">Upgrades at ${targetPos.join(", ")}<span class="sum"> · ${top.length} players</span></span><span class="chev" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div>
+     <div class="sec-b"><div class="sec-in"><div class="cards">${cards||'<div class="empty-state">Your lineup is balanced. Nobody is a clear upgrade.</div>'}</div></div></div></div>
+     <div class="sec" data-sec="machine"><div class="ptitle sec-h" role="button" tabindex="0" style="padding-top:4px"><div class="ico" style="background:rgba(89,167,255,.15)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#59a7ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></svg></div><h2>Trade machine</h2><span class="note">Best deal with each team<span class="sum"> · ${Object.keys(byTeam).length} deals</span></span><span class="chev" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div>
+     <div class="sec-b"><div class="sec-in">${deals||'<div class="empty-state">No deals line up yet.</div>'}</div></div></div>
    </div>`;
 }
 
@@ -863,14 +892,14 @@ function renderRight(){
   const waiting=list.map(x=>`<div class="wait" data-pid="${esc(x.p.player_id)}">${headshot(x.p)}<div class="pinfo"><div class="pn">${esc(pname(x.p))}${x.m.youth?'<span class="badge keep">Keeper age</span>':""}</div><div class="ps">${sub(x.p)} · ${prevYr}: ${f1(x.m.prev)} ppg</div></div><div class="triage">${f1(x.stash)}<small>STASH</small></div></div>`).join("");
 
   $("#colRight").innerHTML=`
-   <div class="panel-t press">
-     <div class="ptitle"><div class="ico" style="background:rgba(255,77,109,.15)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff4d6d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v3"/></svg></div><h2>Press box</h2><span class="note">Beat writers for your teams</span></div>
-     <div class="ticker"><span class="live">LIVE</span><div class="track" style="--dur:${Math.max(25,items.length*6)}s">${track}${track}</div></div>
-     <div class="scroll" style="max-height:46vh"><div class="creds">${creds}</div><div class="sect" style="margin:0 16px 8px">NATIONAL</div><div class="natl">${natl}</div></div>
+   <div class="panel-t press sec" data-sec="press">
+     <div class="ptitle sec-h" role="button" tabindex="0"><div class="ico" style="background:rgba(255,77,109,.15)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff4d6d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v3"/></svg></div><h2>Press box</h2><span class="note">Beat writers for your teams<span class="sum"> · ${order.length} teams</span></span><span class="chev" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div>
+     <div class="sec-b"><div class="sec-in"><div class="ticker"><span class="live">LIVE</span><div class="track" style="--dur:${Math.max(25,items.length*6)}s">${track}${track}</div></div>
+     <div class="scroll" style="max-height:46vh"><div class="creds">${creds}</div><div class="sect" style="margin:0 16px 8px">NATIONAL</div><div class="natl">${natl}</div></div></div></div>
    </div>
-   <div class="panel-t tent">
-     <div class="canopy"><div class="sign"><span class="x"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M4 0h4v4h4v4H8v4H4V8H0V4h4z" fill="#fff"/></svg></span>Medical tent</div></div>
-     <div class="tent-body">
+   <div class="panel-t tent sec" data-sec="tent">
+     <div class="canopy sec-h" role="button" tabindex="0"><div class="sign"><span class="x"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M4 0h4v4h4v4H8v4H4V8H0V4h4z" fill="#fff"/></svg></span>Medical tent<span class="sum" style="font-weight:600;font-size:12px;color:#6b7280">${mine.length?` · ${mine.length} injured`:" · all healthy"}</span><span class="chev" style="color:#1b2130" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div></div>
+     <div class="sec-b"><div class="sec-in"><div class="tent-body">
        <div class="beds">${beds.join("")}</div>${alerts.join("")}
        <div class="sect">PATIENT CHARTS${mine.length&&docsOn().length?`<a class="follow" style="margin-left:auto;font-size:11px;padding:4px 10px" href="${docSearch(mine)}" target="_blank" rel="noopener">Check all with doctors</a>`:""}</div>
        ${charts||'<div class="empty-state" style="padding:10px">Everyone on your roster is healthy.</div>'}
@@ -880,8 +909,9 @@ function renderRight(){
        <div class="sect">WAITING ROOM<span class="note">IR-eligible free agents</span></div>
        <div class="chips" style="padding:0 0 8px">${["ALL",...SKILL].map(p=>`<button class="chip${TF.pos===p?" on":""}" data-k="${p}">${p==="ALL"?"All":p}</button>`).join("")}</div>
        <div class="waiting">${waiting||'<div class="empty-state">Nobody worth stashing at this position.</div>'}</div>
-     </div>
+     </div></div></div>
    </div>`;
+  applyCollapsed();
   $("#colRight").querySelectorAll("[data-k]").forEach(b=>b.addEventListener("click",()=>{TF.pos=b.dataset.k;renderRight()}));
   $("#colRight").querySelectorAll("[data-doc]").forEach(b=>b.addEventListener("click",()=>{const h=b.dataset.doc;let o=ls.get("sl_docs_off",[]);o=o.includes(h)?o.filter(x=>x!==h):[...o,h];ls.set("sl_docs_off",o);renderRight()}));
   $("#docAddBtn").addEventListener("click",()=>{const f=$("#addDoc");f.classList.toggle("hidden");f.h.focus()});
