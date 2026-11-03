@@ -28,7 +28,7 @@ button,input,select{font:inherit;color:inherit}
 .gate h1{font-size:20px;font-weight:700;line-height:1.25;margin:12px 0 4px;letter-spacing:-.01em}
 .gate p{color:var(--muted);margin:0 0 14px;font-size:13px}
 .gate-form{display:flex;flex-direction:column;gap:10px}
-.input{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:13px 14px;font-size:15px;width:100%}
+.input{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:13px 14px;font-size:16px;width:100%;position:relative;z-index:2;-webkit-user-select:text;user-select:text}
 .input::placeholder{color:var(--faint)}
 .btn{border:0;border-radius:999px;padding:12px 20px;font-weight:600;cursor:pointer;background:var(--surface-2)}
 .btn.primary{background:var(--teal);color:var(--teal-ink)}
@@ -459,7 +459,7 @@ body{background:radial-gradient(1100px 520px at 50% -160px,rgba(0,206,184,.17),t
     <h1>Your league's front office</h1>
     <p>Enter your Sleeper username and hold to run out.</p>
     <form class="gate-form" id="connectForm">
-      <input class="input" id="username" placeholder="Your Sleeper username" autocomplete="off" autocapitalize="off">
+      <input class="input" id="username" placeholder="Your Sleeper username" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go" inputmode="text">
       <input class="input" id="season" type="number" min="2018" max="2035" aria-label="Season" style="display:none">
       <button class="btn primary hold" type="button" id="holdBtn"><i class="fill"></i><span>Hold to run out</span></button>
     </form>
@@ -584,7 +584,7 @@ hb.addEventListener("pointerdown",startHold);
 ["pointerup","pointercancel","pointerleave"].forEach(ev=>hb.addEventListener(ev,endHold));
 hb.addEventListener("contextmenu",e=>e.preventDefault());
 addEventListener("blur",endHold);
-document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&!e.repeat&&!$("#gate").classList.contains("hidden"))startHold(e)});
+document.addEventListener("keydown",e=>{if(e.target&&e.target.tagName==="INPUT"&&e.key!=="Enter")return;if((e.key==="Enter"||e.key===" ")&&!e.repeat&&!$("#gate").classList.contains("hidden")){if(e.target&&e.target.tagName==="INPUT")e.target.blur();startHold(e)}});
 document.addEventListener("keyup",e=>{if(e.key==="Enter"||e.key===" ")endHold()});
 window.finishRun=function(){connect().then(ok=>{if(!ok)window.resetRun()})};
 window.resetRun=function(){RUN.holdAcc=0;RUN.done=false;RUN.p=0;RUN.holding=false;const c=$("#tunnel");c.classList.remove("hidden");c.style.opacity="1";box.classList.remove("running");hb.style.setProperty("--p",0);dispatchEvent(new Event("run-reset"))};
@@ -899,9 +899,10 @@ import {OutputPass} from "three/addons/postprocessing/OutputPass.js";
 import {RoomEnvironment} from "three/addons/environments/RoomEnvironment.js";
 
 let PORT=false;const RUN=window.RUN, cv=document.getElementById("tunnel"), hb=document.getElementById("holdBtn"), box=document.querySelector(".gate-box");
-const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches,MOBILE=matchMedia("(pointer:coarse)").matches;
+const idle=()=>new Promise(r=>setTimeout(r,0));
 const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:"high-performance"});
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setPixelRatio(Math.min(devicePixelRatio,MOBILE?1.6:2));
 renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=0.9;renderer.outputColorSpace=THREE.SRGBColorSpace;
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x040508);scene.fog=new THREE.FogExp2(0x05070b,0.02);
 const camera=new THREE.PerspectiveCamera(62,1,0.05,600);
@@ -922,17 +923,17 @@ function knitPass(g,light){const W=g.canvas.width,H=g.canvas.height,id=g.getImag
 const woodDraw=(base,dark,light)=>(g,w,h)=>{g.fillStyle=base;g.fillRect(0,0,w,h);
   for(let i=0;i<220;i++){const x0=rnd()*w,amp=2+rnd()*6,fr=0.004+rnd()*0.01,ph=rnd()*6;g.strokeStyle=(rnd()<.75?dark:light);g.globalAlpha=0.06+rnd()*0.22;g.lineWidth=0.5+rnd()*2.2;g.beginPath();for(let y=0;y<=h;y+=6){const x=x0+Math.sin(y*fr+ph)*amp+Math.sin(y*fr*3.1)*amp*.3;y?g.lineTo(x,y):g.moveTo(x,y)}g.stroke()}
   g.globalAlpha=1;speckle(g,w,h,3000,[dark],1,.15)};
-const wood=tex(1024,1024,woodDraw("#4a2d1a","#1f1008","#6e4729"));
-const woodDark=tex(1024,1024,woodDraw("#2c1a0e","#120803","#4a2e1b"));
-const carpet=tex(1024,1024,(g,w,h)=>{g.fillStyle="#121a2b";g.fillRect(0,0,w,h);speckle(g,w,h,160000,["#0a101c","#1b2742","#24324f","#0e1524"],1,1)},[3,18]);
-const rubber=tex(256,256,(g,w,h)=>{g.fillStyle="#1a1c20";g.fillRect(0,0,w,h);speckle(g,w,h,9000,["#2a2d33","#101114","#3a3e45"],1.5,1)},[4,30]);
-const tiles=tex(512,512,(g,w,h)=>{g.fillStyle="#5d6168";g.fillRect(0,0,w,h);speckle(g,w,h,14000,["#4a4e55","#6c7179","#3d4046"],1.2,1);g.fillStyle="#5c6168";for(let i=0;i<=2;i++){g.fillRect(i*w/2-2,0,4,h);g.fillRect(0,i*h/2-2,w,4)}},[3.5,30]);
-const paint=tex(256,256,(g,w,h)=>{g.fillStyle="#161e2d";g.fillRect(0,0,w,h);speckle(g,w,h,6000,["#1b2436","#121926"],2,.8)},[30,2]);
-const aoBack=tex(512,1024,(g,w,h)=>{woodDraw("#3a2414","#170b04","#5a3a22")(g,w,h);const v=g.createLinearGradient(0,0,0,h);v.addColorStop(0,"rgba(0,0,0,.55)");v.addColorStop(.18,"rgba(0,0,0,.05)");v.addColorStop(.7,"rgba(0,0,0,.15)");v.addColorStop(1,"rgba(0,0,0,.7)");g.fillStyle=v;g.fillRect(0,0,w,h);const hz=g.createLinearGradient(0,0,w,0);hz.addColorStop(0,"rgba(0,0,0,.5)");hz.addColorStop(.2,"rgba(0,0,0,0)");hz.addColorStop(.8,"rgba(0,0,0,0)");hz.addColorStop(1,"rgba(0,0,0,.5)");g.fillStyle=hz;g.fillRect(0,0,w,h)});
+await idle();const wood=tex(1024,1024,woodDraw("#4a2d1a","#1f1008","#6e4729"));
+await idle();const woodDark=tex(1024,1024,woodDraw("#2c1a0e","#120803","#4a2e1b"));
+await idle();const carpet=tex(1024,1024,(g,w,h)=>{g.fillStyle="#121a2b";g.fillRect(0,0,w,h);speckle(g,w,h,160000,["#0a101c","#1b2742","#24324f","#0e1524"],1,1)},[3,18]);
+await idle();const rubber=tex(256,256,(g,w,h)=>{g.fillStyle="#1a1c20";g.fillRect(0,0,w,h);speckle(g,w,h,9000,["#2a2d33","#101114","#3a3e45"],1.5,1)},[4,30]);
+await idle();const tiles=tex(512,512,(g,w,h)=>{g.fillStyle="#5d6168";g.fillRect(0,0,w,h);speckle(g,w,h,14000,["#4a4e55","#6c7179","#3d4046"],1.2,1);g.fillStyle="#5c6168";for(let i=0;i<=2;i++){g.fillRect(i*w/2-2,0,4,h);g.fillRect(0,i*h/2-2,w,4)}},[3.5,30]);
+await idle();const paint=tex(256,256,(g,w,h)=>{g.fillStyle="#161e2d";g.fillRect(0,0,w,h);speckle(g,w,h,6000,["#1b2436","#121926"],2,.8)},[30,2]);
+await idle();const aoBack=tex(512,1024,(g,w,h)=>{woodDraw("#3a2414","#170b04","#5a3a22")(g,w,h);const v=g.createLinearGradient(0,0,0,h);v.addColorStop(0,"rgba(0,0,0,.55)");v.addColorStop(.18,"rgba(0,0,0,.05)");v.addColorStop(.7,"rgba(0,0,0,.15)");v.addColorStop(1,"rgba(0,0,0,.7)");g.fillStyle=v;g.fillRect(0,0,w,h);const hz=g.createLinearGradient(0,0,w,0);hz.addColorStop(0,"rgba(0,0,0,.5)");hz.addColorStop(.2,"rgba(0,0,0,0)");hz.addColorStop(.8,"rgba(0,0,0,0)");hz.addColorStop(1,"rgba(0,0,0,.5)");g.fillStyle=hz;g.fillRect(0,0,w,h)});
 const NAMES=["CARTER","MORGAN","REYES","COLLINS","BROOKS","HAYES","PRICE","WARD"];
 const JC=[["#1c2944","#00ceb8","#ffffff"],["#f2f4f7","#1c2944","#00a896"],["#1c2944","#ffffff","#00ceb8"],["#0e1a30","#00ceb8","#e9edf3"]];
-function jerseyTex(i){const [body,trim,num]=JC[i%4];return tex(1024,1280,(g,w,h)=>{
-  g.clearRect(0,0,w,h);g.scale(4,4);w=256;h=320;
+function jerseyTex(i){const [body,trim,num]=JC[i%4];return tex(768,960,(g,w,h)=>{
+  g.clearRect(0,0,w,h);g.scale(3,3);w=256;h=320;
   const path=()=>{g.beginPath();g.moveTo(80,16);g.quadraticCurveTo(128,34,176,16);g.lineTo(206,24);g.quadraticCurveTo(236,36,252,70);g.lineTo(230,122);g.quadraticCurveTo(214,116,200,108);g.lineTo(202,306);g.quadraticCurveTo(128,316,54,306);g.lineTo(56,108);g.quadraticCurveTo(42,116,26,122);g.lineTo(4,70);g.quadraticCurveTo(20,36,50,24);g.closePath()};
   path();g.fillStyle=body;g.fill();g.save();path();g.clip();
   // knit texture
@@ -1034,7 +1035,7 @@ inst(rg,M.rod,N*2,(d,i,s)=>{d.position.set(s*(HW-0.32),1.88,zOf(i));d.rotation.s
 // jerseys on hangers: draped geometry, fabric sheen
 const jg=new THREE.PlaneGeometry(0.62,0.78,28,28);{const pa=jg.attributes.position;for(let k=0;k<pa.count;k++){const x=pa.getX(k),y=pa.getY(k),u=x/0.31,v=(y+0.39)/0.78;
   const bulge=0.055*Math.cos(Math.min(1,Math.abs(u))*Math.PI/2)*(0.4+0.6*(1-Math.abs(v-0.55)*1.4));const folds=0.006*Math.sin(u*9+v*2)*(1-v);pa.setZ(k,bulge+folds-(v>0.9?0.02*(v-0.9)*10*Math.abs(u):0))}jg.computeVertexNormals()}
-for(let v=0;v<8;v++){const mat=new THREE.MeshPhysicalMaterial({map:jerseyTex(v),bumpMap:knit,bumpScale:0.6,sheen:1,sheenRoughness:.45,sheenColor:new THREE.Color(0xffffff),roughness:.78,alphaTest:.5,alphaToCoverage:true,side:THREE.DoubleSide,envMapIntensity:.25});
+for(let v=0;v<8;v++){await idle();const mat=new THREE.MeshPhysicalMaterial({map:jerseyTex(v),bumpMap:knit,bumpScale:0.6,sheen:1,sheenRoughness:.45,sheenColor:new THREE.Color(0xffffff),roughness:.78,alphaTest:.5,alphaToCoverage:true,side:THREE.DoubleSide,envMapIntensity:.25});
   inst(jg,mat,N*2,(d,i,s)=>{if(((i*3+(s>0?5:0))%8)!==v)return false;d.position.set(s*(HW-0.32),1.45,zOf(i)+0.05);d.rotation.set(0,s<0?0.95:-0.95,(rnd()-.5)*0.04)})}
 // wire hangers
 const hgeo=new THREE.TorusGeometry(0.2,0.006,6,24,Math.PI*0.9);hgeo.rotateZ(Math.PI*0.05);hgeo.scale(1.25,0.32,1);
@@ -1051,7 +1052,7 @@ const cg=new THREE.BoxGeometry(0.1,0.09,0.27);
 for(const off of [-0.07,0.07])inst(cg,M.cleat,N*2,(d,i,s)=>{if((i+(s>0?1:0))%3===0)return false;d.position.set(s*(HW-DEP/2-0.05),0.565,zOf(i)+0.22+off);d.rotation.set(0,s*0.5+off,0)});
 // nameplates with names
 const plg=new THREE.PlaneGeometry(0.34,0.064);
-for(let v=0;v<8;v++){const mat=new THREE.MeshStandardMaterial({map:plateTex(v),emissive:0xffffff,emissiveMap:plateTex(v),emissiveIntensity:.35,roughness:.4});
+for(let v=0;v<8;v++){await idle();const mat=new THREE.MeshStandardMaterial({map:plateTex(v),emissive:0xffffff,emissiveMap:plateTex(v),emissiveIntensity:.35,roughness:.4});
   inst(plg,mat,N*2,(d,i,s)=>{if(((i*3+(s>0?5:0))%8)!==v)return false;d.position.set(s*(HW-DEP-0.05),2.5,zOf(i));d.rotation.set(0,s<0?Math.PI/2:-Math.PI/2,0)})}
 // ceiling LED panels
 for(let z=0;z>-L+2;z-=2.4)for(const x of [-HW*0.44,HW*0.44])plane(0.6,1.2,M.led,[x,CEIL-0.01,z-0.6],[Math.PI/2,0,0]);
@@ -1062,25 +1063,25 @@ boxM(HW*2+1.2,0.7,0.6,concrete,[0,CEIL+0.05,Z0]);for(const s of [-1,1])boxM(0.6,
 /* ---------- the stadium ---------- */
 const basic=(o)=>new THREE.MeshBasicMaterial(Object.assign({fog:false},o));
 const FW=48.8, FL=110, fz=Z0-4-FL/2;
-const turfTex=tex(1024,2048,(g,w,h)=>{for(let k=0;k<22;k++){g.fillStyle=k%2?"#2e7d3a":"#37904a";g.fillRect(0,k*h/22,w,h/22)}speckle(g,w,h,80000,["#2a6f34","#43a057","#25652f"],2,.5)});
+await idle();const turfTex=tex(1024,2048,(g,w,h)=>{for(let k=0;k<22;k++){g.fillStyle=k%2?"#2e7d3a":"#37904a";g.fillRect(0,k*h/22,w,h/22)}speckle(g,w,h,80000,["#2a6f34","#43a057","#25652f"],2,.5)});
 const turf=new THREE.Mesh(new THREE.PlaneGeometry(FW+24,FL+30),basic({map:turfTex}));turf.rotation.x=-Math.PI/2;turf.position.set(0,-0.01,fz);scene.add(turf);
 const lineMat=basic({color:0xf4f7fb});
 for(let k=0;k<=20;k++){const z=Z0-4-9.1-k*4.57;const ln=new THREE.Mesh(new THREE.PlaneGeometry(FW,k%2?0.08:0.13),lineMat);ln.rotation.x=-Math.PI/2;ln.position.set(0,0.005,z);scene.add(ln)}
 for(const s of [-1,1]){const sl=new THREE.Mesh(new THREE.PlaneGeometry(0.15,FL),lineMat);sl.rotation.x=-Math.PI/2;sl.position.set(s*FW/2,0.006,fz);scene.add(sl)}
-const ez=tex(2048,384,(g,w,h)=>{g.fillStyle="#123a52";g.fillRect(0,0,w,h);g.fillStyle="#00ceb8";g.font="220px Graduate, 'Arial Black', sans-serif";g.textAlign="center";g.textBaseline="middle";g.fillText("SIDELINE",w/2,h/2+10)});
+await idle();const ez=tex(2048,384,(g,w,h)=>{g.fillStyle="#123a52";g.fillRect(0,0,w,h);g.fillStyle="#00ceb8";g.font="220px Graduate, 'Arial Black', sans-serif";g.textAlign="center";g.textBaseline="middle";g.fillText("SIDELINE",w/2,h/2+10)});
 const ezm=new THREE.Mesh(new THREE.PlaneGeometry(FW,9.1),basic({map:ez}));ezm.rotation.x=-Math.PI/2;ezm.position.set(0,0.004,Z0-4-4.55);scene.add(ezm);
 // stands: stepped tiers + crowd (instanced, colored)
-const tierGeo=new THREE.BoxGeometry(1,0.6,0.9),fanGeo=new THREE.BoxGeometry(0.42,0.55,0.32);
+await idle();const tierGeo=new THREE.BoxGeometry(1,0.6,0.9),fanGeo=new THREE.BoxGeometry(0.42,0.55,0.32);
 const tierMat=basic({color:0x1b212c}),fanMat=basic({color:0xffffff});
 const sections=[{ox:-(FW/2+8),dir:[-1,0],len:FL+10,cz:fz,rot:0},{ox:(FW/2+8),dir:[1,0],len:FL+10,cz:fz,rot:0},{oz:fz-FL/2-10,dir:[0,-1],len:FW+30,cx:0,rot:1}];
-const ROWS=46,palette=[0x00ceb8,0x1c2944,0xe9edf3,0x00a896,0x24324f,0xfc2b6d,0x59a7ff,0xdfe5ef,0x0e1524,0x33415e];
-let tierCount=0,fanCount=0;for(const sec of sections){tierCount+=ROWS;fanCount+=ROWS*Math.floor(sec.len/0.55)}
+const FS=MOBILE?0.8:0.55,ROWS=46,palette=[0x00ceb8,0x1c2944,0xe9edf3,0x00a896,0x24324f,0xfc2b6d,0x59a7ff,0xdfe5ef,0x0e1524,0x33415e];
+let tierCount=0,fanCount=0;for(const sec of sections){tierCount+=ROWS;fanCount+=ROWS*Math.floor(sec.len/FS)}
 const tiers=new THREE.InstancedMesh(tierGeo,tierMat,tierCount),fans=new THREE.InstancedMesh(fanGeo,fanMat,fanCount);
 let ti=0,fi=0;const col=new THREE.Color(),dd=new THREE.Object3D();
 for(const sec of sections){for(let r=0;r<ROWS;r++){const deck=r>=24?1:0,out=3+r*0.9+deck*4,y=0.6+r*0.66+deck*3.5;
   if(sec.rot){dd.position.set(sec.cx,y-0.3,sec.oz-out);dd.scale.set(sec.len,1,1);dd.rotation.set(0,0,0)}else{dd.position.set(sec.ox+sec.dir[0]*out,y-0.3,sec.cz);dd.scale.set(1,1,sec.len/0.9);dd.rotation.set(0,0,0)}
   dd.updateMatrix();tiers.setMatrixAt(ti++,dd.matrix);dd.scale.set(1,1,1);
-  const n=Math.floor(sec.len/0.55);for(let k=0;k<n;k++){if(rnd()<0.06)continue;const off=-sec.len/2+k*0.55+rnd()*0.12,jit=(rnd()-.5)*0.06;
+  const n=Math.floor(sec.len/FS);for(let k=0;k<n;k++){if(rnd()<0.06)continue;const off=-sec.len/2+k*FS+rnd()*0.12,jit=(rnd()-.5)*0.06;
     if(sec.rot)dd.position.set(sec.cx+off,y+0.28+jit,sec.oz-out);else dd.position.set(sec.ox+sec.dir[0]*out,y+0.28+jit,sec.cz+off);
     dd.rotation.set(0,sec.rot?0:Math.PI/2,0);dd.updateMatrix();fans.setMatrixAt(fi,dd.matrix);col.setHex(palette[(rnd()*palette.length)|0]).multiplyScalar(0.55+rnd()*0.5);fans.setColorAt(fi,col);fi++}}}
 fans.count=fi;fans.instanceMatrix.needsUpdate=true;if(fans.instanceColor)fans.instanceColor.needsUpdate=true;scene.add(tiers,fans);
@@ -1109,8 +1110,8 @@ const spool=[];for(let k=0;k<10;k++){const l=new THREE.PointLight(0xffe7c4,2.4,2
 const pool=[];for(let k=0;k<8;k++){const l=new THREE.PointLight(0xf1f5ff,4.5,8,2);scene.add(l);pool.push(l)}
 
 /* ---------- post ---------- */
-const rt=new THREE.WebGLRenderTarget(innerWidth,innerHeight,{type:THREE.HalfFloatType,samples:renderer.capabilities.isWebGL2?4:0});
-const composer=new EffectComposer(renderer,rt);composer.setPixelRatio(Math.min(devicePixelRatio,2));composer.addPass(new RenderPass(scene,camera));
+const rt=new THREE.WebGLRenderTarget(innerWidth,innerHeight,{type:THREE.HalfFloatType,samples:renderer.capabilities.isWebGL2?(MOBILE?2:4):0});
+const composer=new EffectComposer(renderer,rt);composer.setPixelRatio(renderer.getPixelRatio());composer.addPass(new RenderPass(scene,camera));
 const bloom=new UnrealBloomPass(new THREE.Vector2(1,1),0.22,0.25,0.97);composer.addPass(bloom);composer.addPass(new OutputPass());
 function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);composer.setPixelRatio(renderer.getPixelRatio());composer.setSize(w,h);camera.aspect=w/h;PORT=w<h;camera.fov=PORT?72:62;camera.updateProjectionMatrix()}
 addEventListener("resize",resize);resize();
@@ -1120,6 +1121,7 @@ const VMAX=13, RUN_D=D-7;
 window.__sl={freeze:false,get d(){return d},set d(x){d=x}};let d=0,v=0,t=0,last=0,doneT=0,paused=false,ft=16,slow=0,lowQ=false,holdT=0;
 function tick(ts){
   if(cv.classList.contains("hidden")){paused=true;return}
+  const ae=document.activeElement;if(ae&&ae.tagName==="INPUT"&&!RUN.holding&&!RUN.done){last=ts;requestAnimationFrame(tick);return}
   const rawMs=ts-(last||ts),dt=Math.min(0.5,rawMs/1000);last=ts;t+=dt;
   // adaptive quality: drop resolution and glow if frames are slow
   if(rawMs>0){ft=ft*0.9+rawMs*0.1;if(ft>45&&++slow>30&&!lowQ){lowQ=true;renderer.setPixelRatio(1);resize()}}
