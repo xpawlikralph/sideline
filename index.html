@@ -595,7 +595,7 @@ body{background:radial-gradient(1100px 520px at 50% -160px,rgba(0,206,184,.17),t
 
 <script>
 "use strict";
-const BUILD="20261107093644";
+const BUILD="20261107093918";
 (function checkUpdate(){try{fetch(location.pathname+"?b="+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.text():"").then(t=>{const m=t.match(/const BUILD="(\d+)"/);if(m&&m[1]!==BUILD&&sessionStorage.getItem("sl_reloaded")!==m[1]){sessionStorage.setItem("sl_reloaded",m[1]);location.reload()}}).catch(()=>{})}catch(e){}})();
 const API="https://api.sleeper.app/v1", CDN="https://sleepercdn.com";
 const SKILL=["QB","RB","WR","TE"], IR_ALWAYS=["IR","PUP"];
@@ -949,17 +949,21 @@ function tradeEngine(){
   const base=lineupPts(myP,plan);const deals=[];
   const cands=pids=>pids.filter(pid=>["QB","RB","WR","TE"].includes(pl(pid).position)&&!OUTS.includes(pl(pid).injury_status)&&mvOf(pid)>300).sort((a,b)=>mvOf(b)-mvOf(a)).slice(0,12);
   const pairs=a=>{const o=[];for(let i=0;i<a.length;i++)for(let j=i+1;j<a.length;j++)o.push([a[i],a[j]]);return o};
+  // expert verdicts from the podcast booth steer the engine
+  const XV={};if(S.weekly)for(const e of S.weekly.podcasts||[])for(const t of e.takes){const pid=findPid(t.p);if(!pid)continue;const v=t.v;if(["SELL","AVOID"].includes(v))XV[pid]=-1;else if(["BUY","ADD"].includes(v)&&XV[pid]!==-1)XV[pid]=1}
   const myC=cands(myP),mySets=[...myC.map(x=>[x]),...pairs(myC)];
   for(const t of S.rosters){if(t.roster_id===me.roster_id)continue;
     const thP=rosterPids(t).filter(pid=>!(t.reserve||[]).includes(pid)),tb=lineupPts(thP,plan),thC=cands(thP),thSets=[...thC.map(x=>[x]),...pairs(thC)];
     let best=[];
     for(const G of mySets)for(const H of thSets){if(G.length+H.length>3)continue;
+      if(H.some(x=>XV[x]===-1))continue;
       const gv=pkgVal(G),hv=pkgVal(H),r=hv/Math.max(gv,1);if(r>1.12||r<0.84)continue;
       const nm=myP.filter(x=>!G.includes(x)).concat(H),nt=thP.filter(x=>!H.includes(x)).concat(G);
       const dMe=lineupPts(nm,plan)-base;if(dMe<0.3)continue;const dT=lineupPts(nt,plan)-tb;if(dT<-1.5)continue;
       const youth=H.some(x=>(pl(x).age||30)<=24)?0.4:0;
-      const score=dMe+0.45*dT-Math.abs(1-r)*5+youth+(dT>=0?0.5:0);
-      best.push({t,G,H,r,dMe,dT,score,gv,hv})}
+      const xp=H.filter(x=>XV[x]===1).length*0.8-G.filter(x=>XV[x]===1).length*1.2+G.filter(x=>XV[x]===-1).length*0.8;
+      const score=dMe+0.45*dT-Math.abs(1-r)*5+youth+(dT>=0?0.5:0)+xp;
+      best.push({t,G,H,r,dMe,dT,score,gv,hv,xb:H.filter(x=>XV[x]===1),xs:G.filter(x=>XV[x]===-1)})}
     best.sort((a,b)=>b.score-a.score);if(best.length)deals.push(...best.slice(0,2))}
   deals.sort((a,b)=>b.score-a.score);
   return {deals,base}}
@@ -981,6 +985,7 @@ function renderLeft(){
         <div class="swapbtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8a94a8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></svg></div>
         <div class="mcol give"><span class="lab">YOU GIVE</span>${d.G.map(mp).join("")}</div></div>
       <div class="gauge"><i style="left:${pos}%"></i></div><div class="gauge-l"><span>They win</span><span>${fair}% fair</span><span>You win</span></div>
+      ${(d.xb&&d.xb.length)||(d.xs&&d.xs.length)?`<div class="ps" style="margin-top:6px;color:#c7b6ff">🎙 ${[...d.xb.map(x=>`Podcasts say buy ${esc(pl(x).last_name)}`),...d.xs.map(x=>`podcasts say sell ${esc(pl(x).last_name)}`)].join(", ")}</div>`:""}
       ${d.G.length+d.H.length===3?`<div class="ps" style="margin-top:6px">${d.G.length>d.H.length?"They'd need to drop a bench player.":"You'd need to drop a bench player."}</div>`:""}</div>`}).join("");
   const tIco='<div class="ico" style="background:rgba(0,206,184,.15)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00ceb8" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg></div>';
   const mIco='<div class="ico" style="background:rgba(89,167,255,.15)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#59a7ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></svg></div>';
