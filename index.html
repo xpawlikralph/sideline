@@ -195,7 +195,7 @@ button,input,select{font:inherit;color:inherit}
 .shell{max-width:1560px}
 .board{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) minmax(0,1fr);gap:16px;align-items:start;margin-top:18px}
 .board .block{margin-bottom:16px}
-.col-right{display:flex;flex-direction:column;position:sticky;top:12px}
+.board .col{display:flex;flex-direction:column;min-width:0}
 .scroll{max-height:42vh;overflow:auto;overscroll-behavior:contain}
 .scroll::-webkit-scrollbar{width:8px}.scroll::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
 .teamhead{display:flex;align-items:center;gap:14px;padding:16px 18px 6px}
@@ -232,8 +232,8 @@ button,input,select{font:inherit;color:inherit}
 .newtag{display:inline-block;font-size:10px;font-weight:700;color:var(--bg);background:var(--gold);border-radius:5px;padding:1px 5px;margin-left:6px;vertical-align:1px}
 .sub-h{display:flex;align-items:center;gap:8px;padding:12px 18px 4px;font-size:13px;font-weight:600}
 .sub-h .note{margin-left:auto;font-weight:400;color:var(--muted);font-size:12px}
-@media (max-width:1180px){.board{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.col-mid{grid-column:1 / -1;order:-1}.col-right{position:static}}
-@media (max-width:760px){.board{grid-template-columns:minmax(0,1fr)}.col-mid{order:-1}.col-left{order:0}.col-right{order:1}.scroll{max-height:none}}
+
+@media (max-width:760px){.scroll{max-height:none}}
 
 /* ====== themed panels ====== */
 .panel-t{position:relative;border-radius:20px;overflow:hidden;margin-bottom:16px;background:var(--surface)}
@@ -411,7 +411,7 @@ body{background:radial-gradient(1100px 520px at 50% -160px,rgba(0,206,184,.17),t
 .brandmark{width:44px;height:44px;border-radius:13px;background:linear-gradient(145deg,#19e3cc,#00a896);display:grid;place-items:center;box-shadow:0 8px 20px -6px rgba(0,206,184,.6),inset 0 1px 0 rgba(255,255,255,.4)}
 .endzone span{display:inline-block}
 .intro .panel-t{animation:panelIn .75s cubic-bezier(.2,.8,.2,1) both}
-.intro #colLeft .panel-t{animation-delay:.12s}.intro #colRight .panel-t{animation-delay:.22s}.intro #colRight .panel-t + .panel-t{animation-delay:.32s}
+.intro .panel-slot .panel-t{animation-delay:calc(var(--si,0)*.09s)}
 @keyframes panelIn{from{opacity:0;transform:translateY(28px) scale(.985)}}
 .intro .field .token{animation:takeField .8s cubic-bezier(.2,.9,.25,1.12) both;animation-delay:calc(.55s + var(--i,0)*.08s)}
 @keyframes takeField{0%{opacity:0;transform:translate(calc(-50% + var(--fx,0px)),calc(-50% + var(--fy,0px))) scale(.45)}35%{opacity:1}}
@@ -456,6 +456,84 @@ body{background:radial-gradient(1100px 520px at 50% -160px,rgba(0,206,184,.17),t
   .sec.collapsed .sec-h .note .sum::first-letter{visibility:hidden}
   .sec.collapsed .cards,.sec.collapsed .creds{visibility:hidden}
 }
+
+/* ====== customizable layout ====== */
+.board{grid-template-columns:var(--gtc,minmax(0,1fr) minmax(0,1.2fr) minmax(0,1fr))}
+.panel-slot{position:relative}
+.drag-h{display:none}
+.editing .drag-h{display:flex;align-items:center;gap:8px;position:absolute;inset:0 0 auto 0;height:44px;z-index:5;padding:0 10px;border-radius:20px 20px 0 0;background:linear-gradient(180deg,rgba(0,206,184,.95),rgba(0,206,184,.85));color:var(--teal-ink);font-weight:700;font-size:13px;cursor:grab;touch-action:none;user-select:none}
+.editing .drag-h svg{flex:none}
+.editing .drag-h .hide-p{margin-left:auto;border:0;background:rgba(6,48,43,.15);color:var(--teal-ink);border-radius:999px;padding:4px 12px;font-weight:700;font-size:12px;cursor:pointer}
+.editing .panel-slot{outline:2px dashed rgba(0,206,184,.5);outline-offset:3px;border-radius:20px;margin-bottom:16px}
+.editing .panel-slot .panel-t{margin-bottom:0;max-height:220px;overflow:hidden;pointer-events:none;filter:saturate(.6) brightness(.8)}
+.editing .panel-slot::after{content:"";position:absolute;left:0;right:0;bottom:0;height:60px;border-radius:0 0 20px 20px;background:linear-gradient(transparent,var(--bg));pointer-events:none}
+.panel-slot.dragging{position:fixed;z-index:60;pointer-events:none;box-shadow:0 30px 60px rgba(0,0,0,.6);transform:rotate(1.2deg);opacity:.95}
+.drop-ph{border:2px dashed var(--teal);border-radius:20px;background:rgba(0,206,184,.06);margin-bottom:16px}
+.editing .board .col{min-height:160px;padding:6px;border-radius:22px;background:rgba(255,255,255,.02)}
+.editbar{position:sticky;top:8px;z-index:30;margin-top:14px;background:rgba(21,27,40,.96);border:1px solid rgba(0,206,184,.35);border-radius:18px;padding:12px 14px;box-shadow:0 18px 40px rgba(0,0,0,.45)}
+.eb-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.eb-cols{display:inline-flex;background:var(--bg);border-radius:999px;padding:3px;margin-left:auto}
+.eb-cols button{border:0;background:none;color:var(--muted);font-weight:600;font-size:12px;padding:7px 12px;border-radius:999px;cursor:pointer}
+.eb-cols button.on{background:var(--surface-2);color:var(--text)}
+.eb-hidden{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.eb-hidden:empty{display:none}
+.eb-hidden button{border:1px dashed var(--line);background:none;color:var(--muted);border-radius:999px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer}
+.eb-hidden button:hover{color:var(--teal);border-color:var(--teal)}
+@media (max-width:760px){.eb-cols{display:none}}
+
+/* ====== podcast booth ====== */
+.booth{background:radial-gradient(120% 70% at 100% 0%,rgba(169,139,255,.14),transparent 60%),var(--surface)}
+.onair{display:inline-flex;align-items:center;gap:6px;background:#2a0f16;color:#ff6b81;border:1px solid #6e2a33;border-radius:8px;padding:3px 8px;font-size:10px;font-weight:800;letter-spacing:.14em;box-shadow:0 0 18px rgba(255,77,109,.35)}
+.onair i{width:7px;height:7px;border-radius:50%;background:#ff4d6d;box-shadow:0 0 8px #ff4d6d;animation:blink 1.4s infinite}
+.wave{display:inline-flex;align-items:flex-end;gap:2px;height:16px;margin-left:6px}
+.wave span{width:3px;border-radius:2px;background:var(--violet,#a98bff);animation:wv 1s ease-in-out infinite}
+.wave span:nth-child(2){animation-delay:.15s}.wave span:nth-child(3){animation-delay:.3s}.wave span:nth-child(4){animation-delay:.45s}.wave span:nth-child(5){animation-delay:.6s}
+@keyframes wv{0%,100%{height:4px}50%{height:16px}}
+.ep{margin:0 14px 12px;border-radius:16px;background:var(--bg);overflow:hidden}
+.ep-h{display:flex;align-items:center;gap:10px;padding:12px}
+.ep-badge{flex:none;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:13px;color:#0b0f18;background:var(--pc);box-shadow:0 6px 14px -4px var(--pc)}
+.ep-t{font-weight:700;font-size:13px;line-height:1.25}
+.ep-s{font-size:11px;color:var(--muted)}
+.ep-h a{margin-left:auto;flex:none}
+.take{display:grid;grid-template-columns:auto auto 1fr;gap:10px;align-items:center;padding:8px 12px;border-top:1px solid rgba(255,255,255,.04)}
+.take.mine{background:linear-gradient(90deg,rgba(0,206,184,.10),transparent 70%)}
+.take .head img,.take .head .ini{width:34px;height:34px}
+.verdict{font-size:10px;font-weight:800;letter-spacing:.06em;border-radius:6px;padding:3px 7px;min-width:52px;text-align:center}
+.v-good{background:rgba(0,206,184,.15);color:var(--teal)}.v-bad{background:rgba(255,77,109,.15);color:#ff8fa3}.v-mid{background:rgba(255,199,90,.15);color:var(--gold)}.v-stash{background:rgba(169,139,255,.16);color:#c7b6ff}.v-news{background:rgba(89,167,255,.15);color:#8cc3ff}
+.take .tt{font-size:12px;line-height:1.35;color:#c9d0dc;min-width:0}
+.take .tt b{color:var(--text);font-weight:600}
+.own{display:inline-block;font-size:10px;font-weight:700;border-radius:5px;padding:0 5px;margin-left:5px;vertical-align:1px}
+.own.me{background:var(--teal);color:var(--teal-ink)}.own.fa{background:rgba(61,220,132,.15);color:#6fe3a4}.own.op{background:var(--surface-2);color:var(--muted)}
+.srcline{font-size:11px;color:var(--faint);padding:0 16px 14px}
+.srcline a{color:var(--muted);text-decoration:underline}
+
+/* ====== waiver board ====== */
+.claims{background:linear-gradient(180deg,rgba(61,220,132,.08),transparent 140px),var(--surface)}
+.ticket{position:relative;display:grid;grid-template-columns:44px auto 1fr auto;gap:10px;align-items:center;margin:0 14px 10px;padding:10px 12px;border-radius:14px;background:var(--bg);cursor:pointer}
+.ticket::before,.ticket::after{content:"";position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:var(--surface);transform:translateY(-50%)}
+.ticket::before{left:-7px}.ticket::after{right:-7px}
+.ticket .prio{font-size:20px;font-weight:800;color:var(--faint);text-align:center;border-right:1.5px dashed var(--line);padding-right:8px}
+.ticket .head img,.ticket .head .ini{width:40px;height:40px}
+.ticket .tt{font-size:11.5px;color:#c9d0dc;line-height:1.35;margin-top:2px}
+.ticket .stamp{font-size:9px;font-weight:800;letter-spacing:.08em;border:1.5px solid currentColor;border-radius:6px;padding:2px 6px;transform:rotate(-6deg);color:var(--teal)}
+.ticket.taken{opacity:.55}
+.ticket.taken .stamp{color:var(--faint)}
+
+/* ====== D/ST streamers ====== */
+.stream{background:linear-gradient(180deg,rgba(89,167,255,.10),transparent 150px),var(--surface)}
+.dst{display:grid;grid-template-columns:28px 44px 1fr auto;gap:10px;align-items:center;margin:0 14px 8px;padding:10px 12px;border-radius:14px;background:var(--bg);position:relative;overflow:hidden}
+.dst::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--t1)}
+.dst .rk{font-size:22px;font-weight:800;color:var(--faint);text-align:center}
+.dst img.logo,.dst .logo-ini{width:40px;height:40px;object-fit:contain}
+.dst .nm{font-weight:700;font-size:13px}
+.dst .mu{font-size:11px;color:var(--muted)}
+.dst .ex{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.dst .ex span{font-size:9.5px;font-weight:700;background:var(--surface-2);color:#c9d0dc;border-radius:5px;padding:1px 5px}
+.dst .pj{text-align:right}
+.dst .pj b{display:block;font-size:20px;font-weight:800;color:var(--teal);line-height:1}
+.dst .pj span{font-size:10px;color:var(--muted)}
+.mydst{margin:0 14px 10px;padding:8px 12px;border-radius:12px;font-size:12px;background:rgba(255,199,90,.08);color:#ffe2a6}
+.mydst b{color:var(--text)}
 /* mobile: bottom tab bar like the app */
 .tabbar{display:none}
 @media (max-width:860px){
@@ -498,15 +576,17 @@ body{background:radial-gradient(1100px 520px at 50% -160px,rgba(0,206,184,.17),t
     <div class="pickers">
       <select class="pill-select" id="leagueSel" aria-label="League"></select>
       <select class="pill-select" id="teamSel" aria-label="Team"></select>
-      <button class="linkbtn" id="switchUser">Switch user</button>
+      <button class="linkbtn" id="customizeBtn">Customize</button><button class="linkbtn" id="switchUser">Switch user</button>
     </div>
   </header>
   <div class="status" id="status"></div>
-  <main class="board">
-    <section class="col-left" id="colLeft"></section>
-    <section class="col-mid" id="colMid"></section>
-    <section class="col-right" id="colRight"></section>
-  </main>
+  <div class="editbar hidden" id="editbar">
+    <div class="eb-row"><b>Customize layout</b><span class="ps">Drag panels by their handle to move them. Hide what you don't use.</span>
+      <div class="eb-cols" role="group" aria-label="Columns"><button data-cols="1">1 column</button><button data-cols="2">2 columns</button><button data-cols="3">3 columns</button></div>
+      <button class="chip" id="ebReset">Reset</button><button class="btn primary" id="ebDone" style="padding:8px 16px">Done</button></div>
+    <div class="eb-hidden" id="ebHidden"></div>
+  </div>
+  <main class="board" id="board"></main>
   <p class="foot" style="margin-top:4px">Player value blends this season's points per game with Sleeper's next-two-week projections in your league's scoring. Writer list is a 2026 starting point; edit any team and it's saved in this browser.</p>
 </div>
 
@@ -515,7 +595,7 @@ body{background:radial-gradient(1100px 520px at 50% -160px,rgba(0,206,184,.17),t
 
 <script>
 "use strict";
-const BUILD="20261103160756";
+const BUILD="20261107092042";
 (function checkUpdate(){try{fetch(location.pathname+"?b="+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.text():"").then(t=>{const m=t.match(/const BUILD="(\d+)"/);if(m&&m[1]!==BUILD&&sessionStorage.getItem("sl_reloaded")!==m[1]){sessionStorage.setItem("sl_reloaded",m[1]);location.reload()}}).catch(()=>{})}catch(e){}})();
 const API="https://api.sleeper.app/v1", CDN="https://sleepercdn.com";
 const SKILL=["QB","RB","WR","TE"], IR_ALWAYS=["IR","PUP"];
@@ -660,6 +740,14 @@ async function loadLeague(id){
       jSoft(`/projections/nfl/regular/${season}/${wk}`,{}),wk<18?jSoft(`/projections/nfl/regular/${season}/${wk+1}`,{}):Promise.resolve({}),
       jSoft(`/players/nfl/trending/add?lookback_hours=48&limit=60`,[])]);
     S.cur=cur;S.prev=prev;S.trending=trend;S.proj={};
+    // market values (FantasyCalc, crowd-sourced from real trades) + weekly content
+    const sf=(S.league.roster_positions||[]).includes("SUPER_FLEX");
+    const [fc,wk2]=await Promise.all([
+      fetch(`https://api.fantasycalc.com/values/current?isDynasty=false&numQbs=${sf?2:1}&numTeams=${S.rosters.length}&ppr=${rec>=1?1:rec>=0.5?0.5:0}`).then(r=>r.ok?r.json():[]).catch(()=>[]),
+      fetch("data/weekly.json?b="+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.json():null).catch(()=>null)]);
+    S.mv={};for(const e of (fc||[])){const sid=e.player&&e.player.sleeperId;if(sid)S.mv[sid]={v:e.redraftValue||e.value,trend:e.trend30Day||0,tier:e.maybeTier}}
+    S.mvSource=Object.keys(S.mv).length?"FantasyCalc":"Sideline estimate";
+    S.weekly=wk2;
     for(const src of [p1,p2])for(const [pid,st] of Object.entries(src||{})){const v=st&&st[S.pk];if(v>0)(S.proj[pid]=S.proj[pid]||[]).push(v)}
     const mine=rosters.find(r=>r.owner_id===S.user.user_id||(r.co_owners||[]).includes(S.user.user_id));
     S.myRosterId=mine?mine.roster_id:rosters[0].roster_id;
@@ -717,6 +805,7 @@ function openPlayer(pid){
     ${p.injury_status?`<div class="inj-box"><b>${esc(p.injury_status)}</b>${p.injury_body_part?" ("+esc(p.injury_body_part)+")":""}${p.injury_notes?`. ${esc(p.injury_notes)}`:""}</div>`:""}
     <div class="sgrid"><div><b>${f1(m.ppg)}</b><span>${yr} ppg</span></div><div><b>${m.gp||0}</b><span>Games</span></div><div><b>${f1(m.prev)}</b><span>${yr-1} ppg</span></div>
       <div><b>${f1(m.proj)}</b><span>Projected</span></div><div><b>${f1(m.value)}</b><span>Value</span></div><div><b>×${m.kf.toFixed(2)}</b><span>Keeper age</span></div></div>
+    <div class="ps" style="margin:-6px 0 12px">Trade value <b style="color:var(--text)">${Math.round(mvOf(pid)).toLocaleString()}</b> (${esc(S.mvSource||"")})${S.mv&&S.mv[pid]&&S.mv[pid].trend?` · 30-day trend <b style="color:${S.mv[pid].trend>0?"var(--teal)":"#ff8fa3"}">${S.mv[pid].trend>0?"+":""}${S.mv[pid].trend}</b>`:""}</div>
     <div class="ps" style="margin-bottom:14px">Rostered by <b style="color:var(--text)">${esc(ownerOf(pid))}</b></div>
     <div class="sheet-actions"><a class="primary" href="${xSearch(p)}" target="_blank" rel="noopener">Latest news on X</a>${doc?`<a href="${doc}" target="_blank" rel="noopener">Doctor read</a>`:""}</div></div>`;
   $("#sheet").classList.remove("hidden");$("#sheet .x").focus();
@@ -744,7 +833,57 @@ function introAnim(){const app=$("#app");app.classList.remove("intro");void app.
   document.querySelectorAll("[data-count]").forEach(el=>{const to=parseFloat(el.dataset.count),dec=+el.dataset.dec||0,t0=performance.now()+300;const step=t=>{const k=Math.max(0,Math.min(1,(t-t0)/1200)),e=1-Math.pow(1-k,3);el.textContent=(to*e).toFixed(dec);if(k<1)requestAnimationFrame(step)};requestAnimationFrame(step)});
   clearTimeout(introAnim.t);introAnim.t=setTimeout(()=>app.classList.remove("intro"),4200)}
 function applyCollapsed(){const c=ls.get("sl_collapsed",{});document.querySelectorAll(".sec[data-sec]").forEach(el=>{el.classList.toggle("collapsed",!!c[el.dataset.sec]);const h=el.querySelector(".sec-h");if(h&&!h._wired){h._wired=true;h.setAttribute("onclick","void 0");h.addEventListener("click",e=>{if(e.target.closest("a,input,select,[data-pid],button:not(.sec-h)"))return;e.stopPropagation();toggleSec(h)})}})}
-function renderAll(){for(const k in MET)delete MET[k];const prof=teamProfiles();renderMid(prof);renderLeft(prof);renderRight();applyCollapsed()}
+const CHEV='<span class="chev" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>';
+/* ---------- layout: panels in user-arranged columns ---------- */
+const PANELS={team:"My team",targets:"Trade targets",machine:"Trade machine",pods:"Podcast booth",waivers:"Waiver wire",dst:"D/ST streamers",press:"Press box",tent:"Medical tent"};
+const DEFAULT_LAYOUT={cols:[["targets","machine","dst"],["team","pods"],["press","waivers","tent"]],mobile:["team","pods","waivers","targets","machine","tent","dst","press"],hidden:[]};
+let LAYOUT=(()=>{const L=ls.get("sl_layout",null);if(!L||!L.cols)return JSON.parse(JSON.stringify(DEFAULT_LAYOUT));const all=Object.keys(PANELS),seen=new Set([...L.cols.flat(),...(L.hidden||[])]);
+  for(const k of all)if(!seen.has(k)){L.cols[L.cols.length>1?1:0].push(k)}if(!L.mobile)L.mobile=DEFAULT_LAYOUT.mobile.slice();for(const k of all)if(!L.mobile.includes(k))L.mobile.push(k);L.hidden=L.hidden||[];return L})();
+const saveLayout=()=>ls.set("sl_layout",LAYOUT);
+const phoneLayout=()=>innerWidth<=760;
+function setPanel(key,html){let el=document.getElementById("p-"+key);if(!el){el=document.createElement("div");el.className="panel-slot";el.id="p-"+key;el.dataset.key=key}
+  el.innerHTML=html?`<div class="drag-h" data-drag="${key}"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>${esc(PANELS[key])}<button class="hide-p" data-hide="${key}">Hide</button></div>`+html:"";
+  el.classList.toggle("hidden",!html);if(!el.isConnected&&!LAYOUT.hidden.includes(key))$("#board").appendChild(el)}
+function placePanels(){const board=$("#board");const phone=phoneLayout();const cols=phone?[LAYOUT.mobile]:LAYOUT.cols;
+  board.style.setProperty("--gtc",phone||cols.length===1?"minmax(0,1fr)":cols.length===2?"minmax(0,1fr) minmax(0,1fr)":"minmax(0,1fr) minmax(0,1.2fr) minmax(0,1fr)");
+  board.style.maxWidth=!phone&&cols.length===1?"820px":"";board.style.margin=!phone&&cols.length===1?"18px auto 0":"";
+  const parked=document.createDocumentFragment();[...board.querySelectorAll(".panel-slot")].forEach(el=>parked.appendChild(el));
+  [...board.children].forEach(c=>{if(!c.classList.contains("col"))c.remove()});
+  const existing=[...board.querySelectorAll(":scope > .col")];const colEls=[];
+  for(let i=0;i<cols.length;i++){let c=existing[i];if(!c){c=document.createElement("section");c.className="col";board.appendChild(c)}c.dataset.col=i;colEls.push(c)}
+  existing.slice(cols.length).forEach(c=>c.remove());
+  let si=0;cols.forEach((keys,i)=>{for(const k of keys){if(LAYOUT.hidden.includes(k))continue;let el=document.getElementById("p-"+k)||parked.querySelector("#p-"+k);if(!el){setPanel(k,"");el=document.getElementById("p-"+k)||parked.querySelector("#p-"+k)}if(!el)continue;el.style.setProperty("--si",si++);colEls[i].appendChild(el)}});
+  for(const k of LAYOUT.hidden){const el=document.getElementById("p-"+k);if(el)el.remove()}
+  renderEditbar()}
+function renderEditbar(){const eb=$("#ebHidden");if(!eb)return;eb.innerHTML=LAYOUT.hidden.map(k=>`<button data-unhide="${k}">+ ${esc(PANELS[k])}</button>`).join("");
+  document.querySelectorAll(".eb-cols button").forEach(b=>b.classList.toggle("on",+b.dataset.cols===LAYOUT.cols.length))}
+function renderAll(){for(const k in MET)delete MET[k];NAMEIDX=null;const prof=teamProfiles();renderMid(prof);renderLeft();renderRight();renderPods();renderWaivers();renderDst();placePanels();applyCollapsed()}
+addEventListener("resize",(()=>{let ph=phoneLayout();return()=>{if(phoneLayout()!==ph){ph=phoneLayout();if(S.league)placePanels()}}})());
+// ----- customize mode -----
+$("#customizeBtn").addEventListener("click",()=>{document.body.classList.toggle("editing");$("#editbar").classList.toggle("hidden",!document.body.classList.contains("editing"));renderEditbar()});
+$("#ebDone").addEventListener("click",()=>{document.body.classList.remove("editing");$("#editbar").classList.add("hidden")});
+$("#ebReset").addEventListener("click",()=>{LAYOUT=JSON.parse(JSON.stringify(DEFAULT_LAYOUT));saveLayout();placePanels()});
+document.querySelectorAll(".eb-cols button").forEach(b=>b.addEventListener("click",()=>{const n=+b.dataset.cols,flat=LAYOUT.cols.flat();const cols=Array.from({length:n},()=>[]);
+  if(n===3){const d=DEFAULT_LAYOUT.cols;flat.forEach(k=>{const i=d.findIndex(c=>c.includes(k));cols[i<0?1:i].push(k)})}else if(n===2){flat.forEach((k,i)=>cols[["team","pods","press","waivers","tent"].includes(k)?1:0].push(k))}else cols[0]=["team",...flat.filter(k=>k!=="team")];
+  LAYOUT.cols=cols;saveLayout();placePanels()}));
+document.addEventListener("click",e=>{const h=e.target.closest("[data-hide]");if(h){e.stopPropagation();const k=h.dataset.hide;LAYOUT.hidden.push(k);saveLayout();placePanels();return}
+  const u=e.target.closest("[data-unhide]");if(u){const k=u.dataset.unhide;LAYOUT.hidden=LAYOUT.hidden.filter(x=>x!==k);const list=phoneLayout()?LAYOUT.mobile:LAYOUT.cols[0];if(!LAYOUT.cols.flat().includes(k))LAYOUT.cols[0].unshift(k);saveLayout();placePanels()}},true);
+// ----- drag & drop (pointer events: mouse + touch) -----
+let DRAG=null;
+document.addEventListener("pointerdown",e=>{const h=e.target.closest("[data-drag]");if(!h||e.target.closest("[data-hide]")||!document.body.classList.contains("editing"))return;e.preventDefault();
+  const el=h.parentElement,rc=el.getBoundingClientRect(),ph=document.createElement("div");ph.className="drop-ph";ph.style.height=rc.height+"px";el.parentElement.insertBefore(ph,el);
+  el.classList.add("dragging");el.style.width=rc.width+"px";el.style.left=rc.left+"px";el.style.top=rc.top+"px";document.body.appendChild(el);
+  DRAG={el,ph,dx:e.clientX-rc.left,dy:e.clientY-rc.top,id:e.pointerId};try{h.setPointerCapture(e.pointerId)}catch(_){}});
+document.addEventListener("pointermove",e=>{if(!DRAG)return;e.preventDefault();DRAG.el.style.left=(e.clientX-DRAG.dx)+"px";DRAG.el.style.top=(e.clientY-DRAG.dy)+"px";
+  if(e.clientY<70)scrollBy(0,-14);else if(e.clientY>innerHeight-70)scrollBy(0,14);
+  const cols=[...document.querySelectorAll("#board .col")];let col=cols.find(c=>{const r=c.getBoundingClientRect();return e.clientX>=r.left&&e.clientX<=r.right})||cols.reduce((b,c)=>{const r=c.getBoundingClientRect(),d=Math.abs(e.clientX-(r.left+r.right)/2);return !b||d<b.d?{c,d}:b},null).c;
+  const items=[...col.querySelectorAll(":scope > .panel-slot")];let before=null;for(const it of items){const r=it.getBoundingClientRect();if(e.clientY<r.top+r.height/2){before=it;break}}
+  if(before)col.insertBefore(DRAG.ph,before);else col.appendChild(DRAG.ph)},{passive:false});
+const endDrag=()=>{if(!DRAG)return;const {el,ph}=DRAG;ph.parentElement.insertBefore(el,ph);ph.remove();el.classList.remove("dragging");el.style.cssText="";DRAG=null;
+  const cols=[...document.querySelectorAll("#board .col")].map(c=>[...c.querySelectorAll(":scope > .panel-slot")].map(x=>x.dataset.key));
+  if(phoneLayout())LAYOUT.mobile=[...cols[0],...LAYOUT.mobile.filter(k=>!cols[0].includes(k))];else LAYOUT.cols=cols.map((c,i)=>[...c,...LAYOUT.cols[i].filter(k=>LAYOUT.hidden.includes(k)&&!c.includes(k))]);
+  saveLayout()};
+document.addEventListener("pointerup",endDrag);document.addEventListener("pointercancel",endDrag);
 const isPhone=()=>innerWidth<=760;
 function toggleSec(h){if(!isPhone())return;const sec=h.closest(".sec");if(!sec)return;const c=ls.get("sl_collapsed",{});c[sec.dataset.sec]=!sec.classList.contains("collapsed");ls.set("sl_collapsed",c);sec.classList.toggle("collapsed",c[sec.dataset.sec]);if(!c[sec.dataset.sec])setTimeout(()=>sec.scrollIntoView({behavior:"smooth",block:"nearest"}),200)}
 document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.classList&&e.target.classList.contains("sec-h")){e.preventDefault();toggleSec(e.target)}});
@@ -779,7 +918,7 @@ function renderMid(prof){
     const list=spots[slot];if(list){const k=used2[slot]=(used2[slot]||0);used2[slot]++;const xy=list[k%list.length];onField.push(token(pid,lbl,xy[0],xy[1]))}else special.push(token(pid,lbl,null,null))});
   const benchIds=(r.players||[]).filter(pid=>!starters.includes(pid)&&!(r.reserve||[]).includes(pid)&&!(r.taxi||[]).includes(pid)).sort((a,b)=>metric(b).value-metric(a).value);
   const rings=SKILL.map(pos=>`<div class="ring">${ringSvg(me.rank[pos],n,`var(--${pos})`)}<div class="lbl pos ${pos}">${pos}</div><div class="of">${ord(me.rank[pos])} of ${n}</div></div>`).join("");
-  $("#colMid").innerHTML=`<div class="panel-t sec" data-sec="team">
+  setPanel("team",`<div class="panel-t sec" data-sec="team">
     <div class="hdr-team sec-h" role="button" tabindex="0"><div class="avatar">${av}</div><div style="min-width:0"><div class="tn">${esc(teamName(r))}</div><div class="ps">${esc(u.display_name||"")}</div></div>
       <div class="rec"><b>${st.wins||0}-${st.losses||0}${st.ties?"-"+st.ties:""}</b><span>${ord(rank)} of ${n}</span></div><span class="chev" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div>
     <div class="sec-b"><div class="sec-in">
@@ -790,58 +929,125 @@ function renderMid(prof){
       ${special.length?`<div class="st-row">${special.join("")}</div>`:""}
       <div class="bench"><span class="lab">BENCH</span><div class="bench-row">${benchIds.map(pid=>token(pid,"",null,null)).join("")||'<div class="ps" style="padding:8px">Empty bench</div>'}</div></div>
       ${(r.reserve||[]).length?`<div class="ir-strip"><span class="lab">INJURED RESERVE</span><div class="bench-row">${r.reserve.map(pid=>token(pid,"IR",null,null)).join("")}</div></div>`:""}
-    </div></div></div></div>`;
+    </div></div></div></div>`);
 }
 
-function buildIdeas(prof){
-  const me=prof[S.teamRosterId],N=depthN(),c=slotCounts(),ded={QB:c.QB,RB:c.RB,WR:c.WR,TE:c.TE};
-  const needs=SKILL.filter(p=>me.z[p]<-0.25).sort((a,b)=>me.z[a]-me.z[b]),surplus=SKILL.filter(p=>me.z[p]>0.25);
-  const pieces=[];for(const pos of SKILL)me.bp[pos].forEach((m,i)=>{if(i>=ded[pos]||(surplus.includes(pos)&&i>=ded[pos]-1&&me.bp[pos].length>N[pos]))pieces.push(m)});
-  const targetPos=needs.length?needs:[SKILL.slice().sort((a,b)=>me.z[a]-me.z[b])[0]];
-  const floor={};for(const pos of SKILL){const s=me.bp[pos].slice(0,N[pos]);floor[pos]=s.length<N[pos]?0:s[s.length-1].value}
-  const ideas=[];
-  for(const id in prof){if(+id===S.teamRosterId)continue;const t=prof[id];
-    for(const pos of targetPos){if(t.z[pos]<-0.2)continue;
-      t.bp[pos].forEach((m,i)=>{
-        if(!(i>=ded[pos]||t.z[pos]>1)||m.value<=floor[pos]+0.5||m.value<4||IR_ALWAYS.includes(m.p.injury_status))return;
-        const theirNeeds=SKILL.filter(p=>t.z[p]<0&&p!==pos);
-        const pool=pieces.filter(x=>(x.p.position!==pos||surplus.includes(pos))&&!IR_ALWAYS.includes(x.p.injury_status));
-        let best=null;for(const x of pool){const fits=theirNeeds.includes(x.p.position),gap=Math.abs(x.value-m.value)/Math.max(m.value,1),sc=gap-(fits?0.25:0);if(!best||sc<best.sc)best={x,sc,gap,fits}}
-        let combo=null;if(!best||best.gap>0.25){for(let a=0;a<pool.length;a++)for(let b=a+1;b<pool.length;b++){const v=pool[a].value*0.85+pool[b].value*0.55,gap=Math.abs(v-m.value)/Math.max(m.value,1);if(gap<0.15&&(!combo||gap<combo.gap))combo={a:pool[a],b:pool[b],gap}}}
-        const gain=m.value-floor[pos],pw=(pos==="QB"&&!c.SF)?0.55:pos==="RB"?1.15:1;
-        const give=best&&best.gap<=0.25?[best.x]:combo?[combo.a,combo.b]:best?[best.x]:[];
-        const gap=best&&best.gap<=0.25?best.gap:combo?combo.gap:best?best.gap+0.3:1;
-        const fit=gain*pw+(-me.z[pos])*2+(best&&best.fits?2:0)+(m.buyLow?1.5:0)+(m.youth?0.5:0)-gap*4;
-        ideas.push({m,t,pos,give,gap,gain,fit,theirNeeds:SKILL.filter(p=>t.z[p]<-0.25),fits:give.some(g=>theirNeeds.includes(g.p.position))});
-      })}}
-  return {ideas:ideas.sort((a,b)=>b.fit-a.fit),targetPos};
-}
-
-/* ---------- left: war room ---------- */
-function mp(m){const c=tcol(m.p.team)[0];return `<div class="mp" data-pid="${esc(m.p.player_id)}" style="--t1:${c}">${photo(m.p)}<div class="nm">${esc(pname(m.p))}<small><span class="pos ${esc(m.p.position)}">${esc(m.p.position)}</span> ${esc(m.p.team||"")} · ${f1(m.value)}</small></div></div>`}
-function renderLeft(prof){
-  const {ideas,targetPos}=buildIdeas(prof);
-  const seen=new Set(),top=ideas.filter(x=>!seen.has(x.m.pid)&&seen.add(x.m.pid)).slice(0,8);
-  const cards=top.map(x=>{const p=x.m.p,c=tcol(p.team);return `<button class="tcard" data-pid="${esc(p.player_id)}" style="--t1:${c[0]}"><span class="num">${esc(p.number||"")}</span>
-     <div class="tags">${x.m.buyLow?"<span>BUY LOW</span>":""}${x.m.youth?"<span>KEEPER</span>":""}${p.injury_status?`<span style="background:#ff4d6d">${esc(p.injury_status.toUpperCase())}</span>`:""}</div>
-     <div class="ph">${photo(p)}</div><div class="tn">${esc(pname(p))}</div><div class="tm">${esc(p.position)} · ${esc(p.team||"FA")} · ${esc(teamName(x.t.r))}</div>
-     <div class="gain"><b>+${f1(x.gain)}</b><span>pts / week</span></div></button>`}).join("");
-  const byTeam={};for(const x of ideas){if(!x.give.length)continue;const k=x.t.r.roster_id;if(!byTeam[k]||x.fit>byTeam[k].fit)byTeam[k]=x}
-  const deals=Object.values(byTeam).sort((a,b)=>b.fit-a.fit).map(x=>{
-    const getV=x.m.value,giveV=x.give.length===1?x.give[0].value:x.give[0].value*0.85+x.give[1].value*0.55,pos=Math.max(4,Math.min(96,50+(getV-giveV)/Math.max(getV,giveV,1)*100));
-    const why=x.fits?`Fills their ${[...new Set(x.give.map(g=>g.p.position))].join("/")} need`:x.theirNeeds.length?`They're thin at ${x.theirNeeds.join("/")}`:"Value swap";
-    const u=userOf(x.t.r)||{},av=u.avatar?`<img src="${CDN}/avatars/${esc(u.avatar)}" alt="" onerror="this.remove()">`:initials(teamName(x.t.r));
-    return `<div class="machine"><div class="mt"><div class="av">${av}</div><b>${esc(teamName(x.t.r))}</b><span class="why">${why}</span></div>
-      <div class="mside"><div class="mcol get"><span class="lab">YOU GET</span>${mp(x.m)}</div>
+/* ---------- trade engine: market value (FantasyCalc) + lineup impact for both teams ---------- */
+const OUTS=["IR","PUP","Out","Sus","NA","DNR"];
+function mvOf(pid){const m=S.mv&&S.mv[pid];if(m&&m.v)return m.v;const x=metric(pid);return Math.max(0,x.value)*380*x.kf}
+function wkPts(pid){const p=pl(pid);if(OUTS.includes(p.injury_status))return 0;return Math.max(0,metric(pid).value)}
+function slotPlan(){const rp=(S.league.roster_positions||[]).filter(x=>x!=="BN"&&x!=="IR");const ded=[],flex=[];const elig={FLEX:["RB","WR","TE"],SUPER_FLEX:["QB","RB","WR","TE"],REC_FLEX:["WR","TE"],WRRB_FLEX:["WR","RB"]};
+  for(const s of rp){if(elig[s])flex.push(elig[s]);else ded.push(s)}return {ded,flex}}
+function lineupPts(pids,plan){const by={};for(const pid of pids){const pos=pl(pid).position;(by[pos]=by[pos]||[]).push(wkPts(pid))}for(const k in by)by[k].sort((a,b)=>b-a);
+  const idx={};let tot=0;const take=pos=>{const arr=by[pos];const i=idx[pos]||0;if(!arr||i>=arr.length)return 0;idx[pos]=i+1;return arr[i]};
+  for(const s of plan.ded)tot+=take(s);
+  for(const el of plan.flex){let best=null,bv=-1;for(const pos of el){const arr=by[pos],i=idx[pos]||0;if(arr&&i<arr.length&&arr[i]>bv){bv=arr[i];best=pos}}if(best)tot+=take(best)}
+  return tot}
+function pkgVal(list){const v=list.map(mvOf).sort((a,b)=>b-a);return (v[0]||0)+0.72*(v[1]||0)+0.55*(v[2]||0)}
+function tradeEngine(){
+  const plan=slotPlan(),me=curRoster(),myP=rosterPids(me).filter(pid=>!(me.reserve||[]).includes(pid));
+  const base=lineupPts(myP,plan);const deals=[];
+  const cands=pids=>pids.filter(pid=>["QB","RB","WR","TE"].includes(pl(pid).position)&&!OUTS.includes(pl(pid).injury_status)&&mvOf(pid)>300).sort((a,b)=>mvOf(b)-mvOf(a)).slice(0,12);
+  const pairs=a=>{const o=[];for(let i=0;i<a.length;i++)for(let j=i+1;j<a.length;j++)o.push([a[i],a[j]]);return o};
+  const myC=cands(myP),mySets=[...myC.map(x=>[x]),...pairs(myC)];
+  for(const t of S.rosters){if(t.roster_id===me.roster_id)continue;
+    const thP=rosterPids(t).filter(pid=>!(t.reserve||[]).includes(pid)),tb=lineupPts(thP,plan),thC=cands(thP),thSets=[...thC.map(x=>[x]),...pairs(thC)];
+    let best=[];
+    for(const G of mySets)for(const H of thSets){if(G.length+H.length>3)continue;
+      const gv=pkgVal(G),hv=pkgVal(H),r=hv/Math.max(gv,1);if(r>1.12||r<0.84)continue;
+      const nm=myP.filter(x=>!G.includes(x)).concat(H),nt=thP.filter(x=>!H.includes(x)).concat(G);
+      const dMe=lineupPts(nm,plan)-base;if(dMe<0.3)continue;const dT=lineupPts(nt,plan)-tb;if(dT<-0.1)continue;
+      const youth=H.some(x=>(pl(x).age||30)<=24)?0.4:0;
+      const score=dMe+0.55*Math.max(0,dT)-Math.abs(1-r)*5+youth;
+      best.push({t,G,H,r,dMe,dT,score,gv,hv})}
+    best.sort((a,b)=>b.score-a.score);if(best.length)deals.push(...best.slice(0,2))}
+  deals.sort((a,b)=>b.score-a.score);
+  return {deals,base}}
+function mp(pid){const p=pl(pid),c=tcol(p.team)[0];return `<div class="mp" data-pid="${esc(pid)}" style="--t1:${c}">${photo(p)}<div class="nm">${esc(pname(p))}<small><span class="pos ${esc(p.position)}">${esc(p.position)}</span> ${esc(p.team||"")} · ${Math.round(mvOf(pid)).toLocaleString()}</small></div></div>`}
+function renderLeft(){
+  const {deals}=tradeEngine();
+  // targets: best incoming player per deal, de-duplicated
+  const seen=new Set(),targets=[];for(const d of deals){const pid=d.H.slice().sort((a,b)=>mvOf(b)-mvOf(a))[0];if(seen.has(pid))continue;seen.add(pid);targets.push({pid,d});if(targets.length>=8)break}
+  const cards=targets.map(({pid,d})=>{const p=pl(pid),c=tcol(p.team),m=metric(pid);return `<button class="tcard" data-pid="${esc(pid)}" style="--t1:${c[0]}"><span class="num">${esc(p.number||"")}</span>
+     <div class="tags">${m.buyLow?"<span>BUY LOW</span>":""}${m.youth?"<span>KEEPER</span>":""}${p.injury_status?`<span style="background:#ff4d6d">${esc(p.injury_status.toUpperCase())}</span>`:""}</div>
+     <div class="ph">${photo(p)}</div><div class="tn">${esc(pname(p))}</div><div class="tm">${esc(p.position)} · ${esc(p.team||"FA")} · ${esc(teamName(d.t))}</div>
+     <div class="gain"><b>+${f1(d.dMe)}</b><span>lineup pts / wk</span></div></button>`}).join("");
+  const byTeam={};for(const d of deals){const k=d.t.roster_id;if(!byTeam[k])byTeam[k]=d}
+  const list=Object.values(byTeam);
+  const machines=list.map(d=>{const pos=Math.max(4,Math.min(96,50+(d.r-1)*220));const u=userOf(d.t)||{},av=u.avatar?`<img src="${CDN}/avatars/thumb/${esc(u.avatar)}" alt="" onerror="this.remove()">`:initials(teamName(d.t));
+    const fair=Math.round(Math.min(d.r,1/d.r)*100);
+    return `<div class="machine"><div class="mt"><div class="av">${av}</div><b>${esc(teamName(d.t))}</b><span class="why">You <b style="color:var(--teal)">+${f1(d.dMe)}</b>/wk · Them <b style="color:${d.dT>0.05?"var(--teal)":"var(--muted)"}">${d.dT>=0?"+":""}${f1(d.dT)}</b>/wk</span></div>
+      <div class="mside"><div class="mcol get"><span class="lab">YOU GET</span>${d.H.map(mp).join("")}</div>
         <div class="swapbtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8a94a8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></svg></div>
-        <div class="mcol give"><span class="lab">YOU GIVE</span>${x.give.map(mp).join("")}</div></div>
-      <div class="gauge"><i style="left:${pos}%"></i></div><div class="gauge-l"><span>They win</span><span>Fair</span><span>You win</span></div></div>`}).join("");
-  $("#colLeft").innerHTML=`<div class="panel-t war">
-     <div class="sec" data-sec="targets"><div class="ptitle sec-h" role="button" tabindex="0"><div class="ico" style="background:rgba(0,206,184,.15)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00ceb8" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg></div><h2>Trade targets</h2><span class="note">Upgrades at ${targetPos.join(", ")}<span class="sum"> · ${top.length} players</span></span><span class="chev" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div>
-     <div class="sec-b"><div class="sec-in"><div class="cards">${cards||'<div class="empty-state">Your lineup is balanced. Nobody is a clear upgrade.</div>'}</div></div></div></div>
-     <div class="sec" data-sec="machine"><div class="ptitle sec-h" role="button" tabindex="0" style="padding-top:4px"><div class="ico" style="background:rgba(89,167,255,.15)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#59a7ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></svg></div><h2>Trade machine</h2><span class="note">Best deal with each team<span class="sum"> · ${Object.keys(byTeam).length} deals</span></span><span class="chev" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div>
-     <div class="sec-b"><div class="sec-in">${deals||'<div class="empty-state">No deals line up yet.</div>'}</div></div></div>
-   </div>`;
+        <div class="mcol give"><span class="lab">YOU GIVE</span>${d.G.map(mp).join("")}</div></div>
+      <div class="gauge"><i style="left:${pos}%"></i></div><div class="gauge-l"><span>They win</span><span>${fair}% fair</span><span>You win</span></div>
+      ${d.G.length+d.H.length===3?`<div class="ps" style="margin-top:6px">${d.G.length>d.H.length?"They'd need to drop a bench player.":"You'd need to drop a bench player."}</div>`:""}</div>`}).join("");
+  const tIco='<div class="ico" style="background:rgba(0,206,184,.15)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00ceb8" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg></div>';
+  const mIco='<div class="ico" style="background:rgba(89,167,255,.15)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#59a7ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></svg></div>';
+  setPanel("targets",`<div class="panel-t war sec" data-sec="targets"><div class="ptitle sec-h" role="button" tabindex="0">${tIco}<h2>Trade targets</h2><span class="note">Biggest lineup upgrades at a fair price<span class="sum"> · ${targets.length} players</span></span>${CHEV}</div>
+     <div class="sec-b"><div class="sec-in"><div class="cards">${cards||'<div class="empty-state">No fair upgrades right now. Your lineup is already strong for its trade value.</div>'}</div></div></div></div>`);
+  setPanel("machine",`<div class="panel-t war sec" data-sec="machine"><div class="ptitle sec-h" role="button" tabindex="0">${mIco}<h2>Trade machine</h2><span class="note">Win-win deals, priced by ${esc(S.mvSource)}<span class="sum"> · ${list.length} deals</span></span>${CHEV}</div>
+     <div class="sec-b"><div class="sec-in">
+     <div class="srcline" style="padding-top:0">Each deal is fair by market value and makes <b style="color:var(--text)">both</b> starting lineups score more per week.</div>
+     ${machines||'<div class="empty-state">No fair deal improves both lineups right now.</div>'}</div></div></div>`);
+}
+
+/* ---------- podcast booth ---------- */
+const VCLS={BUY:"v-good",ADD:"v-good",START:"v-good",BOOM:"v-good",PRIORITY:"v-good",SELL:"v-bad",AVOID:"v-bad",HOLD:"v-mid",FLEX:"v-mid",RISKY:"v-mid",STASH:"v-stash",NEWS:"v-news"};
+const normName=n=>String(n||"").toLowerCase().replace(/\b(jr|sr|ii|iii|iv)\b\.?/g,"").replace(/[^a-z]/g,"");
+let NAMEIDX=null;
+function findPid(name){if(!NAMEIDX){NAMEIDX={};for(const p of Object.values(S.players)){if(!p||!p.full_name||!["QB","RB","WR","TE","K"].includes(p.position))continue;const k=normName(p.full_name);if(!NAMEIDX[k]||(p.team&&!pl(NAMEIDX[k]).team))NAMEIDX[k]=p.player_id}}return NAMEIDX[normName(name)]||null}
+function ownerTag(pid){if(!pid)return "";const r=S.rosters.find(x=>rosterPids(x).includes(pid));if(!r)return '<span class="own fa">FREE AGENT</span>';if(r.roster_id===S.teamRosterId)return '<span class="own me">YOURS</span>';return `<span class="own op">${esc(teamName(r))}</span>`}
+let PODF="mine";
+function renderPods(){
+  const W=S.weekly;if(!W){setPanel("pods",`<div class="panel-t booth"><div class="ptitle"><h2>Podcast booth</h2></div><div class="empty-state">This week's podcast notes didn't load. Pull to refresh.</div></div>`);return}
+  const r=curRoster(),mine=new Set(rosterPids(r));
+  const eps=W.podcasts.map(e=>{const takes=e.takes.map(t=>({...t,pid:findPid(t.p)})).filter(t=>PODF==="all"||(PODF==="mine"?t.pid&&mine.has(t.pid):t.pid&&!S.rosters.some(x=>rosterPids(x).includes(t.pid))));
+    if(!takes.length)return "";
+    return `<div class="ep" style="--pc:${esc(e.color||"#00ceb8")}"><div class="ep-h"><div class="ep-badge">${esc(e.badge)}</div><div style="min-width:0"><div class="ep-t">${esc(e.title)}</div><div class="ep-s">${esc(e.show)} · ${esc(e.ep)} · ${esc(e.date)}</div></div><a class="follow" href="${esc(e.url)}" target="_blank" rel="noopener">Listen</a></div>
+      ${takes.map(t=>{const p=t.pid?pl(t.pid):{player_id:"x",full_name:t.p,position:""};return `<div class="take${t.pid&&mine.has(t.pid)?" mine":""}"><span class="verdict ${VCLS[t.v]||"v-news"}">${esc(t.v)}</span><div ${t.pid?`data-pid="${esc(t.pid)}" style="cursor:pointer"`:""}>${headshot(p,false)}</div><div class="tt"><b>${esc(t.p)}</b>${ownerTag(t.pid)}<br>${esc(t.t)}</div></div>`}).join("")}</div>`}).join("");
+  const mineCount=W.podcasts.reduce((a,e)=>a+e.takes.filter(t=>{const pid=findPid(t.p);return pid&&mine.has(pid)}).length,0);
+  const vias=[...new Set(W.podcasts.map(e=>e.via).filter(Boolean))];
+  setPanel("pods",`<div class="panel-t booth sec" data-sec="pods"><div class="ptitle sec-h" role="button" tabindex="0"><span class="onair"><i></i>ON AIR</span><h2>Podcast booth</h2><span class="wave"><span></span><span></span><span></span><span></span><span></span></span><span class="note">Week ${W.week} edge takeaways<span class="sum"> · ${mineCount} on your team</span></span>${CHEV}</div>
+    <div class="sec-b"><div class="sec-in">
+    <div class="chips" style="padding:0 14px 10px">${[["mine",`My guys (${mineCount})`],["fa","Free agents"],["all","Everything"]].map(([k,l])=>`<button class="chip${PODF===k?" on":""}" data-podf="${k}">${l}</button>`).join("")}</div>
+    ${eps||`<div class="empty-state">${PODF==="mine"?"Neither show talked about your players this week. Switch to Everything.":"Nothing in this filter."}</div>`}
+    <div class="srcline">Takeaways paraphrased from Establish The Run and Ian Hartitz episodes${vias.length?`, with ETR notes via <a href="${esc(vias[0])}" target="_blank" rel="noopener">FF Hound</a>`:""}. Updated ${esc(W.updated)}.</div>
+    </div></div></div>`);
+  document.querySelectorAll("[data-podf]").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();PODF=b.dataset.podf;renderPods();applyCollapsed()}));
+}
+
+/* ---------- waiver wire (Daigle) ---------- */
+function renderWaivers(){
+  const W=S.weekly&&S.weekly.waivers;if(!W){setPanel("waivers","");return}
+  const owned=new Set();S.rosters.forEach(x=>rosterPids(x).forEach(p=>owned.add(p)));
+  const picks=W.picks.map(x=>({...x,pid:findPid(x.p)})).sort((a,b)=>(a.pid&&owned.has(a.pid))-(b.pid&&owned.has(b.pid)));
+  const avail=picks.filter(x=>x.pid&&!owned.has(x.pid)).length;
+  let n=0;
+  const rows=picks.map(x=>{const p=x.pid?pl(x.pid):{player_id:"x",full_name:x.p,position:""},taken=x.pid&&owned.has(x.pid);if(!taken)n++;
+    return `<div class="ticket${taken?" taken":""}" ${x.pid?`data-pid="${esc(x.pid)}"`:""}><div class="prio">${taken?"–":n}</div>${headshot(p)}<div style="min-width:0"><div class="pn">${esc(x.p)}${ownerTag(x.pid)}</div><div class="ps">${x.pid?sub(p):""}</div><div class="tt">${esc(x.t)}</div></div><span class="stamp">${esc(taken?"GONE":x.v)}<br><span style="font-weight:600;letter-spacing:0;opacity:.8">${esc(x.who)}</span></span></div>`}).join("");
+  const ico='<div class="ico" style="background:rgba(61,220,132,.15)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3ddc84" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v4a2 2 0 000 4v4H4v-4a2 2 0 000-4z"/><path d="M10 7v12" stroke-dasharray="2 2"/></svg></div>';
+  setPanel("waivers",`<div class="panel-t claims sec" data-sec="waivers"><div class="ptitle sec-h" role="button" tabindex="0">${ico}<h2>Waiver wire</h2><span class="note">${esc(W.title)} · Week ${S.weekly.week}<span class="sum"> · ${avail} available</span></span>${CHEV}</div>
+    <div class="sec-b"><div class="sec-in">${rows}<div class="srcline">${esc(W.note)} <a href="${esc(W.url)}" target="_blank" rel="noopener">Read Daigle's column</a>. Refreshed every Monday night. Updated ${esc(S.weekly.updated)}.</div></div></div></div>`);
+}
+
+/* ---------- D/ST streamers ---------- */
+function renderDst(){
+  const X=S.weekly&&S.weekly.dst,ex=(X&&X.week===S.week)?X.experts:{};
+  const owned=new Set();S.rosters.forEach(x=>rosterPids(x).forEach(p=>owned.add(p)));
+  const r=curRoster(),myDef=rosterPids(r).filter(pid=>pl(pid).position==="DEF");
+  const teams=Object.keys(TEAMS).map(t=>{const pr=S.proj[t],proj=pr&&pr.length?pr[0]:null,e=ex[t];return {t,proj,e,score:(proj||5)+(e?e.src.length*1.6:0),avail:!owned.has(t)}});
+  const top=teams.filter(x=>x.avail&&(x.proj||x.e)).sort((a,b)=>b.score-a.score).slice(0,5);
+  const mine=myDef.length?myDef.map(t=>{const pr=S.proj[t];return `<b>${esc(TEAMS[t]||t)}</b>${pr&&pr.length?` (${f1(pr[0])} proj)`:""}`}).join(", "):null;
+  const startsDef=(S.league.roster_positions||[]).includes("DEF");
+  const rows=top.map((x,i)=>{const c=tcol(x.t);return `<div class="dst" style="--t1:${c[0]}"><div class="rk">${i+1}</div>${teamLogo(x.t)}<div style="min-width:0"><div class="nm">${esc(TEAMS[x.t])}</div><div class="mu">${x.e&&x.e.opp?esc(x.e.opp)+" · ":""}free agent</div>${x.e?`<div class="ex">${x.e.src.map(s2=>`<span>${esc(s2)}</span>`).join("")}</div>`:""}</div><div class="pj"><b>${x.proj!=null?f1(x.proj):"–"}</b><span>Sleeper proj</span></div></div>`}).join("");
+  const ico='<div class="ico" style="background:rgba(89,167,255,.15)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#59a7ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg></div>';
+  setPanel("dst",!startsDef?"":`<div class="panel-t stream sec" data-sec="dst"><div class="ptitle sec-h" role="button" tabindex="0">${ico}<h2>D/ST streamers</h2><span class="note">Top 5 available in your league · Week ${S.week}<span class="sum"> · ${top[0]?esc(top[0].t)+" #1":""}</span></span>${CHEV}</div>
+    <div class="sec-b"><div class="sec-in">
+    <div class="mydst">${mine?`Your defense: ${mine}.`:`<b>Your DEF slot is empty.</b> Grab #1 below.`}</div>
+    ${rows||'<div class="empty-state">No defense projections yet for this week.</div>'}
+    <div class="srcline">Ranked by Sleeper's projection plus how many expert streaming columns picked them${X&&X.week===S.week?`: ${X.sources.map(s2=>`<a href="${esc(s2.url)}" target="_blank" rel="noopener">${esc(s2.n)}</a>`).join(", ")}`:""}.</div>
+    </div></div></div>`);
 }
 
 /* ---------- right: press box + medical tent ---------- */
@@ -892,12 +1098,13 @@ function renderRight(){
   const prevYr=+S.league.season-1;
   const waiting=list.map(x=>`<div class="wait" data-pid="${esc(x.p.player_id)}">${headshot(x.p)}<div class="pinfo"><div class="pn">${esc(pname(x.p))}${x.m.youth?'<span class="badge keep">Keeper age</span>':""}</div><div class="ps">${sub(x.p)} · ${prevYr}: ${f1(x.m.prev)} ppg</div></div><div class="triage">${f1(x.stash)}<small>STASH</small></div></div>`).join("");
 
-  $("#colRight").innerHTML=`
+  setPanel("press",`
    <div class="panel-t press sec" data-sec="press">
      <div class="ptitle sec-h" role="button" tabindex="0"><div class="ico" style="background:rgba(255,77,109,.15)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff4d6d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v3"/></svg></div><h2>Press box</h2><span class="note">Beat writers for your teams<span class="sum"> · ${order.length} teams</span></span><span class="chev" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div>
      <div class="sec-b"><div class="sec-in"><div class="ticker"><span class="live">LIVE</span><div class="track" style="--dur:${Math.max(25,items.length*6)}s">${track}${track}</div></div>
      <div class="scroll" style="max-height:46vh"><div class="creds">${creds}</div><div class="sect" style="margin:0 16px 8px">NATIONAL</div><div class="natl">${natl}</div></div></div></div>
-   </div>
+   </div>`);
+  setPanel("tent",`
    <div class="panel-t tent sec" data-sec="tent">
      <div class="canopy sec-h" role="button" tabindex="0"><div class="sign"><span class="x"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M4 0h4v4h4v4H8v4H4V8H0V4h4z" fill="#fff"/></svg></span>Medical tent<span class="sum" style="font-weight:600;font-size:12px;color:#6b7280">${mine.length?` · ${mine.length} injured`:" · all healthy"}</span><span class="chev" style="color:#1b2130" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div></div>
      <div class="sec-b"><div class="sec-in"><div class="tent-body">
@@ -911,10 +1118,10 @@ function renderRight(){
        <div class="chips" style="padding:0 0 8px">${["ALL",...SKILL].map(p=>`<button class="chip${TF.pos===p?" on":""}" data-k="${p}">${p==="ALL"?"All":p}</button>`).join("")}</div>
        <div class="waiting">${waiting||'<div class="empty-state">Nobody worth stashing at this position.</div>'}</div>
      </div></div></div>
-   </div>`;
+   </div>`);
   applyCollapsed();
-  $("#colRight").querySelectorAll("[data-k]").forEach(b=>b.addEventListener("click",()=>{TF.pos=b.dataset.k;renderRight()}));
-  $("#colRight").querySelectorAll("[data-doc]").forEach(b=>b.addEventListener("click",()=>{const h=b.dataset.doc;let o=ls.get("sl_docs_off",[]);o=o.includes(h)?o.filter(x=>x!==h):[...o,h];ls.set("sl_docs_off",o);renderRight()}));
+  document.querySelectorAll("#p-tent [data-k]").forEach(b=>b.addEventListener("click",()=>{TF.pos=b.dataset.k;renderRight()}));
+  document.querySelectorAll("#p-tent [data-doc]").forEach(b=>b.addEventListener("click",()=>{const h=b.dataset.doc;let o=ls.get("sl_docs_off",[]);o=o.includes(h)?o.filter(x=>x!==h):[...o,h];ls.set("sl_docs_off",o);renderRight()}));
   $("#docAddBtn").addEventListener("click",()=>{const f=$("#addDoc");f.classList.toggle("hidden");f.h.focus()});
   const ad=$("#addDoc");ad.addEventListener("submit",e=>{e.preventDefault();const h=ad.h.value.trim().replace(/^@/,"");if(!h)return;const c=ls.get("sl_docs_custom",[]);c.push({n:"@"+h,o:"Added by you",h});ls.set("sl_docs_custom",c);renderRight()});
 }

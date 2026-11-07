@@ -1,0 +1,125 @@
+{
+  "week": 9,
+  "season": 2026,
+  "updated": "2026-11-07",
+  "podcasts": [
+    {
+      "show": "Establish The Run", "badge": "ETR", "color": "#00ceb8",
+      "host": "Evan Silva & Adam Levitan",
+      "title": "Team-by-Team: Everything To Know Heading Into Week 9", "ep": "Ep. 1043", "date": "Nov 3",
+      "url": "https://podcasts.apple.com/us/podcast/establish-the-run-fantasy-football/id1473055758",
+      "via": "https://ffhound.substack.com/p/ff-hound-11426-full-notes",
+      "takes": [
+        {"p": "Terrance Ferguson", "v": "ADD", "t": "On track to return from the ankle in Week 9 or 10 as the Rams' clear No. 2 target. Scoop him now."},
+        {"p": "Jonah Coleman", "v": "BUY", "t": "Has seized Denver's lead-back job, with Dobbins phased out when they trail."},
+        {"p": "Quinshon Judkins", "v": "SELL", "t": "Dylan Sampson is back and monopolizing Cleveland's passing-down work."},
+        {"p": "Seth McGowan", "v": "ADD", "t": "Must-roster in all formats as the direct beneficiary in Indianapolis."},
+        {"p": "Bijan Robinson", "v": "BUY", "t": "Buy low despite three straight down games."},
+        {"p": "Ashton Jeanty", "v": "AVOID", "t": "Essentially benched on early downs for Mike Washington."},
+        {"p": "Lamar Jackson", "v": "NEWS", "t": "Thumb surgery likely ends his season. Downgrade every Ravens skill player."}
+      ]
+    },
+    {
+      "show": "Establish The Run", "badge": "ETR", "color": "#00ceb8",
+      "host": "Levitan, Daigle, Dankenbring & Miller",
+      "title": "Rest Of Season Top-150: Players To Buy And Sell Before Week 9", "ep": "Ep. 1044", "date": "Nov 4",
+      "url": "https://podcasts.apple.com/us/podcast/establish-the-run-fantasy-football/id1473055758",
+      "via": "https://ffhound.substack.com/p/ff-hound-11526-full-notes",
+      "takes": [
+        {"p": "Zay Flowers", "v": "HOLD", "t": "Hold or buy after the Jacoby Brissett trade. Brissett is far steadier than Fagnano."},
+        {"p": "Derrick Henry", "v": "HOLD", "t": "Don't sell before the trade deadline passes. JAX, TB and PIT are next."},
+        {"p": "Justin Jefferson", "v": "BUY", "t": "Buy ahead of Carson Wentz. More under-center snaps and heavy pass volume vs DET, BUF, GB, SF."},
+        {"p": "Antonio Williams", "v": "BUY", "t": "Aggressive buy. Stepped into McLaurin's full-time role with 83% snaps and a 24% target share."},
+        {"p": "Tony Pollard", "v": "SELL", "t": "Five TDs on 46 carries won't last, and Tyjae Spears is due back for pass downs."},
+        {"p": "Michael Wilson", "v": "SELL", "t": "Sell high after a 30-expected-point game. Broken ribs and a tough three-game stretch."},
+        {"p": "Emeka Egbuka", "v": "BUY", "t": "Buy low on the injury. No top-10 pass defense on his schedule until Week 17."},
+        {"p": "Nico Collins", "v": "BUY", "t": "Buy low out of the bye. Jaylin Noel's IR trip clears out target competition."},
+        {"p": "Parker Washington", "v": "BUY", "t": "Buy below his ETR rank. 24% target share with DAL and WAS in Weeks 16-17."},
+        {"p": "A.J. Brown", "v": "AVOID", "t": "Chronic knee issue is back. Dropped 19 spots to 50th."}
+      ]
+    },
+    {
+      "show": "Fantasy Football with Ian Hartitz", "badge": "IH", "color": "#a98bff",
+      "host": "Ian Hartitz",
+      "title": "Week 9 RB Rankings: Happy Chase Brown BOOM week", "ep": "RB ranks", "date": "Nov 4",
+      "url": "https://www.stackedfantasy.com/nfl/news/sources/69/oZBSxGMbPps",
+      "takes": [
+        {"p": "Chase Brown", "v": "START", "t": "RB13 and Hartitz's boom call. Bengals offense humming vs ATL and Perine's role is shrinking."},
+        {"p": "Kenneth Walker III", "v": "START", "t": "RB2. Ignore the quiet games: 9.5-point home favorite vs the Jets."},
+        {"p": "James Cook", "v": "START", "t": "Cleared concussion protocol. Expects a strong day vs Minnesota."},
+        {"p": "Jonah Coleman", "v": "START", "t": "Upside RB2. Took over pass downs and Carolina leaks points to backs."},
+        {"p": "Derrick Henry", "v": "FLEX", "t": "Low-end flex at best. Ravens offense is sliding and JAX is stingy vs RBs."},
+        {"p": "Breece Hall", "v": "RISKY", "t": "Rank could miss by 10 spots either way. Braelon Allen should handle early downs."},
+        {"p": "Raheem Mostert", "v": "STASH", "t": "Cook handcuff who's been productive and is widely available."},
+        {"p": "Emmett Johnson", "v": "STASH", "t": "Top waiver stash. Efficient, but no flex value while Walker is healthy."}
+      ]
+    },
+    {
+      "show": "Fantasy Football with Ian Hartitz", "badge": "IH", "color": "#a98bff",
+      "host": "Ian Hartitz",
+      "title": "Week 9 WR Rankings: shadow matchups & best game environments", "ep": "WR ranks", "date": "Nov 4",
+      "url": "https://www.stackedfantasy.com/nfl/news/sources/69/xdTg6FZmrVs",
+      "takes": [
+        {"p": "CeeDee Lamb", "v": "START", "t": "WR3. Volume is steady and Sauce Gardner isn't expected to shadow him."},
+        {"p": "Jaxon Smith-Njigba", "v": "START", "t": "Still WR1 even with Drew Lock under center."},
+        {"p": "Amon-Ra St. Brown", "v": "START", "t": "Dolphins are dead last in EPA allowed per dropback."},
+        {"p": "Tee Higgins", "v": "START", "t": "WR7 in a breakout year as Cincinnati's most productive option after Chase."},
+        {"p": "Jameson Williams", "v": "BOOM", "t": "Boom play against a Miami defense that struggles with deep shots."},
+        {"p": "Matthew Golden", "v": "START", "t": "WR8, ahead of Watson, because he's beaten man coverage."},
+        {"p": "Rashee Rice", "v": "RISKY", "t": "Boom-or-bust. The Jets play heavy man coverage."}
+      ]
+    },
+    {
+      "show": "Fantasy Football with Ian Hartitz", "badge": "IH", "color": "#a98bff",
+      "host": "Ian Hartitz",
+      "title": "Week 9 Injury Report: Breece Hall is BACK, Cam Skattebo is HURT", "ep": "Injuries", "date": "Nov 6",
+      "url": "https://www.stackedfantasy.com/nfl/news/sources/69/OvvCa8m_PNY",
+      "takes": [
+        {"p": "Carson Wentz", "v": "NEWS", "t": "Starting for Kyler Murray (hamstring). Bump Jefferson and Addison."},
+        {"p": "Drew Lock", "v": "NEWS", "t": "Starting for Sam Darnold in Seattle."},
+        {"p": "Garrett Wilson", "v": "NEWS", "t": "Out (concussion). Adonai Mitchell and Omar Cooper Jr. move up."},
+        {"p": "Breece Hall", "v": "NEWS", "t": "Off the injury report and back this week."},
+        {"p": "Cam Skattebo", "v": "NEWS", "t": "Hurt and trending doubtful."}
+      ]
+    }
+  ],
+  "waivers": {
+    "title": "Daigle's Waiver Wire",
+    "source": "John Daigle, Establish The Run",
+    "url": "https://establishtherun.com/waiver-wire-analysis-week-9-8/",
+    "note": "Daigle's full column is behind ETR's paywall. His headliners lead the board, backed by free ETR podcast calls and the wider consensus.",
+    "picks": [
+      {"p": "Mike Washington Jr.", "v": "PRIORITY", "who": "Daigle", "t": "Handed the Raiders' workhorse role in Week 8, out-carrying Jeanty 25-2. Stickiness is uncertain, but that volume is the add of the week."},
+      {"p": "Antonio Williams", "v": "PRIORITY", "who": "Daigle", "t": "His ascension continues: 83% snaps and a 24% target share in his first game without McLaurin."},
+      {"p": "Terrance Ferguson", "v": "ADD", "who": "Daigle", "t": "Returning from the ankle as the Rams' clear No. 2 target behind Puka."},
+      {"p": "Tyler Allgeier", "v": "PRIORITY", "who": "ETR pod", "t": "Near every-down back with Jeremiyah Love on IR and Bam Knight concussed. Worth a top claim."},
+      {"p": "Seth McGowan", "v": "ADD", "who": "ETR pod", "t": "Must-roster as the direct beneficiary in Indianapolis."},
+      {"p": "Braelon Allen", "v": "ADD", "who": "ETR pod", "t": "At least a 50-50 split with Breece Hall, plus goal-line work."},
+      {"p": "Adonai Mitchell", "v": "ADD", "who": "Consensus", "t": "Upside WR3 with Garrett Wilson out. Went 7-142-1 last week."},
+      {"p": "Jadarian Price", "v": "STASH", "who": "ETR pod", "t": "Operated ahead of Zach Charbonnet in Charbonnet's return."},
+      {"p": "Raheem Mostert", "v": "STASH", "who": "Hartitz", "t": "James Cook's handcuff and productive lately."},
+      {"p": "Emmett Johnson", "v": "STASH", "who": "Hartitz", "t": "Efficient with limited touches behind Kenneth Walker."}
+    ]
+  },
+  "dst": {
+    "week": 9,
+    "experts": {
+      "KC":  {"opp": "vs NYJ", "src": ["RotoWire #1", "FanDuel"]},
+      "NYG": {"opp": "at PHI", "src": ["RotoWire #2", "RotoBaller", "FantraxHQ"]},
+      "NO":  {"opp": "vs CLE", "src": ["RotoWire #3", "RotoBaller", "FantraxHQ"]},
+      "SF":  {"opp": "vs LV",  "src": ["RotoWire #4"]},
+      "DET": {"opp": "at MIA", "src": ["RotoWire #5", "RotoBaller", "FanDuel"]},
+      "SEA": {"opp": "vs ARI", "src": ["RotoBaller #1"]},
+      "JAX": {"opp": "at BAL", "src": ["RotoBaller #2"]},
+      "HOU": {"opp": "at LAC", "src": ["RotoBaller"]},
+      "GB":  {"opp": "",       "src": ["FanDuel"]},
+      "BUF": {"opp": "vs MIN", "src": ["FantraxHQ"]}
+    },
+    "sources": [
+      {"n": "RotoWire", "url": "https://www.rotowire.com/football/article/streaming-defenses-dst-picks-for-week-9-145117"},
+      {"n": "RotoBaller", "url": "https://www.rotoballer.com/week-9-defense-def-streamers-starters-and-rankings-2026-fantasy-tiers-rankings/1982134"},
+      {"n": "FanDuel", "url": "https://www.fanduel.com/research/fantasy-football-3-defenses-to-stream-for-nfl-week-9-2026"},
+      {"n": "FantraxHQ", "url": "https://fantraxhq.com/2026-fantasy-football-week-9-d-st-streamers/"}
+    ]
+  }
+}
